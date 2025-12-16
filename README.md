@@ -1,15 +1,5 @@
 # faker
 
-<!-- TOC -->
-* [faker](#faker)
-  * [Introduction](#introduction)
-  * [Usage](#usage)
-    * [Consuming the library with CMake](#consuming-the-library-with-cmake)
-    * [Code example](#code-example)
-  * [Modules](#modules)
-  * [License](#license)
-<!-- TOC -->
-
 ## Introduction
 
 **faker** is a C++ library that generates fake data for you.
