@@ -7,7 +7,9 @@
 #ifndef FAKER_VALIDATION_H
 #define FAKER_VALIDATION_H
 
+#include <ctime>
 #include <source_location>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 
@@ -40,10 +42,10 @@ void check_empty(
 
 template <typename E, typename T = int32_t>
 void check_range(
-    const T range_start,
-    const std::string_view range_start_name,
-    const T range_end,
-    const std::string_view range_end_name,
+    const T                     range_start,
+    const std::string_view      range_start_name,
+    const T                     range_end,
+    const std::string_view      range_end_name,
     const std::source_location& location = std::source_location::current()
 ) {
     if (range_start == 0 && range_start_name == "0" && range_end < range_start) {
@@ -85,13 +87,13 @@ void check_range(
     CHECK_RANGE_EX(exception_type, range_start, range_end, std::source_location::current())
 
 template <typename E>
-void check_time(const std::tm& tm, const std::source_location& location = std::source_location::current()) {
-    const int year   = tm.tm_year + 1900;
-    const int month  = tm.tm_mon + 1;
-    const int day    = tm.tm_mday;
-    const int hour   = tm.tm_hour;
-    const int minute = tm.tm_min;
-    const int second = tm.tm_sec;
+void check_time(const tm& time, const std::source_location& location = std::source_location::current()) {
+    const int year   = time.tm_year + 1900;
+    const int month  = time.tm_mon + 1;
+    const int day    = time.tm_mday;
+    const int hour   = time.tm_hour;
+    const int minute = time.tm_min;
+    const int second = time.tm_sec;
 
     if (month < 1 || month > 12) {
         throw_exception<E>(

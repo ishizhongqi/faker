@@ -6,6 +6,7 @@
 
 #include "faker/person.h"
 
+#include <algorithm>
 #include <format>
 #include <random>
 #include <string>
@@ -157,7 +158,8 @@ std::string phone_number(const bool is_international, const bool include_delimit
     if (!is_international) {
         // Add a leading zero for the United Kingdom and Japan
         if (selected_region == Regions::UnitedKingdom || selected_region == Regions::Japan) {
-            const auto first_digit = std::ranges::find_if(pattern, isdigit);
+            const auto first_digit =
+                std::find_if(pattern.begin(), pattern.end(), [](unsigned char c) { return std::isdigit(c); });
             if (first_digit != pattern.end()) {
                 if (first_digit[0] != '0') { pattern.insert(first_digit, '0'); }
             }

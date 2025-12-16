@@ -41,6 +41,12 @@ Of course, you can choose to clone the library, build and install it into your p
 headers.
 It’s totally up to your preference.
 
+### Compiler support
+
+- [GCC](https://gcc.gnu.org/) version 13 or newer
+- [Clang](https://clang.llvm.org/) version 16 or newer
+- [Apple Clang](https://clang.llvm.org/) version 16 or newer
+
 ### Code example
 
 [Source code](./example/main.cpp) :

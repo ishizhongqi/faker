@@ -11,16 +11,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.0] - 2025-12-16
+
+### Added
+- Support for Ubuntu Linux platform
+
+---
+
 ## [0.1.0] - 2025-12-14
 
 ### Added
 - Initial release of the faker project.
-
-### Changed
-- N/A
-
-### Fixed
-- N/A
-
-### Removed
-- N/A

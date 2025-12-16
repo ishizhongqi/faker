@@ -2,10 +2,11 @@
 // Licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 
-/// @file string_helper.cc
+/// @file string_helper.cpp
 
 #include "string_helper.h"
 
+#include <algorithm>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -19,7 +20,7 @@ std::string capitalize(const std::string_view word) {
     std::string out(word);
     if (out.empty()) return out;
 
-    std::ranges::transform(out, out.begin(), [](const char c) {
+    std::transform(out.begin(), out.end(), out.begin(), [](const char c) {
         return static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
     });
 
@@ -122,8 +123,8 @@ std::pair<std::string, std::string> replace_wildcards_with_same_characters(
     if (chars.empty()) return {std::string(pattern1), std::string(pattern2)};
 
     // Count the total number of wildcards in both patterns
-    const size_t count1 = std::ranges::count(pattern1, wildcard);
-    const size_t count2 = std::ranges::count(pattern2, wildcard);
+    const size_t count1 = std::count(pattern1.begin(), pattern1.end(), wildcard);
+    const size_t count2 = std::count(pattern2.begin(), pattern2.end(), wildcard);
     if (count1 != count2) { return {std::string(pattern1), std::string(pattern2)}; }
 
     std::mt19937_64&                      random_engine = get_random_engine();

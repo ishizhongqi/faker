@@ -8,53 +8,110 @@ on:
 
 jobs:
   build:
-    name: ${{ matrix.os }} | ${{ matrix.compiler }}
+    name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        compiler: [gcc, clang]
-        exclude:
-          - os: macos-latest
-            compiler: gcc
+        include:
+          # ============================
+          # Ubuntu - GCC (minimum supported)
+          # ============================
+          - name: ubuntu | gcc-13
+            os: ubuntu-latest
+            cc: gcc-13
+            cxx: g++-13
+
+          # ============================
+          # Ubuntu - Clang (minimum supported)
+          # ============================
+          - name: ubuntu | clang-16
+            os: ubuntu-latest
+            cc: clang-16
+            cxx: clang++-16
+
+          # ============================
+          # Ubuntu - Clang (latest)
+          # ============================
+          - name: ubuntu | clang-latest
+            os: ubuntu-latest
+            cc: clang
+            cxx: clang++
+
+          # ============================
+          # macOS - Apple Clang (Xcode)
+          # ============================
+          - name: macos | apple-clang
+            os: macos-latest
+            cc: clang
+            cxx: clang++
 
     steps:
+      # ----------------------------
+      # Checkout source code
+      # ----------------------------
       - name: Checkout
         uses: actions/checkout@v4
 
+      # ----------------------------
+      # Install dependencies (Ubuntu)
+      # ----------------------------
       - name: Install dependencies (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build
+          sudo apt-get install -y \
+            cmake \
+            ninja-build \
+            gcc-13 g++-13 \
+            clang-16
 
+      # ----------------------------
+      # Install dependencies (macOS)
+      # ----------------------------
       - name: Install dependencies (macOS)
         if: matrix.os == 'macos-latest'
         run: |
           brew update
           brew install cmake ninja
 
+      # ----------------------------
+      # Select compiler
+      # ----------------------------
       - name: Select compiler
         run: |
-          if [ "${{ matrix.compiler }}" = "gcc" ]; then
-            echo "CC=gcc" >> $GITHUB_ENV
-            echo "CXX=g++" >> $GITHUB_ENV
-          else
-            echo "CC=clang" >> $GITHUB_ENV
-            echo "CXX=clang++" >> $GITHUB_ENV
-          fi
+          echo "CC=${{ matrix.cc }}" >> $GITHUB_ENV
+          echo "CXX=${{ matrix.cxx }}" >> $GITHUB_ENV
+          echo "Using CC=${{ matrix.cc }}"
+          echo "Using CXX=${{ matrix.cxx }}"
 
+      # ----------------------------
+      # Configure
+      # ----------------------------
       - name: Configure
         run: |
           cmake -S . -B build \
             -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CXX_STANDARD=20 \
+            -DCMAKE_CXX_STANDARD_REQUIRED=ON \
+            -DCMAKE_CXX_EXTENSIONS=OFF \
             -DFAKER_BUILD_TESTS=OFF \
             -DFAKER_BUILD_EXAMPLE=OFF \
             -DFAKER_CODE_COVERAGE=OFF
 
+      # ----------------------------
+      # Build
+      # ----------------------------
       - name: Build
         run: |
           cmake --build build
+
+      # ----------------------------
+      # Optional: Install check
+      # (uncomment if you want to verify install rules)
+      # ----------------------------
+      # - name: Install
+      #   run: |
+      #     cmake --install build --prefix install

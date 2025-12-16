@@ -44,6 +44,12 @@ target_link_libraries(your_target PRIVATE faker)
 当然，你也可以选择直接克隆该库，将其构建并安装到你的项目中，然后链接对应的库和头文件。
 这完全取决于你的个人偏好。
 
+### 编译器
+
+- [GCC](https://gcc.gnu.org/) 13 或 更高版本
+- [Clang](https://clang.llvm.org/) 16 或 更高版本
+- [Apple Clang](https://clang.llvm.org/) 16 或 更高版本
+
 ### 代码示例
 
 [源代码](example/main.cpp)：
