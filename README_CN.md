@@ -122,17 +122,17 @@ Person::Email      : KimberlyMullen.live@hotmail.com
 
 ## 模块
 
-| 模块       | 接口                                                                                                                                |
-|:---------|:----------------------------------------------------------------------------------------------------------------------------------|
-| business | company_name, department, industry, **Company**                                                                                   |
-| computer | ip_address*, mac_address*, file_path, file_directory, file_name, file_extension, url*, hostname*, **File***                       |
-| datetime | date, time, datetime                                                                                                              |
-| location | address_line1, address_line2, postcode, full_address, city, region, **Location**                                                  |
-| number   | integer, unsigned_integer, decimal, decimal_string                                                                                |
-| payment  | payment_method, card_type, card_number*, card_date, **Card***                                                                     |
-| person   | first_name, last_name, full_name, gender, title, marital_status, phone_number*, email*, job_title, social_network_id, **Person*** |
-| product  | product_name, product_category, color, size, barcode*                                                                             |
-| string   | enum_item, text, uuid                                                                                                             |
+| 模块       | 接口                                                                                                                                 |
+|:---------|:-----------------------------------------------------------------------------------------------------------------------------------|
+| business | company_name, department, industry, **Company**                                                                                    |
+| computer | ip_address*, mac_address*, file_path, file_directory, file_name, file_extension, url*, hostname*, **File***                        |
+| datetime | date, time, datetime                                                                                                               |
+| location | address_line1, address_line2, postcode, full_address, city, region, **Location**                                                   |
+| number   | integer, unsigned_integer, decimal, decimal_string                                                                                 |
+| payment  | payment_method, card_type, card_number*, card_date, **Card***                                                                      |
+| person   | first_name, last_name, full_name, gender, title, marital_status, phone_number*, email*, job_title, social_network_id*, **Person*** |
+| product  | product_name, product_category, color, size, barcode*                                                                              |
+| string   | enum_item, text, uuid                                                                                                              |
 
 function* : 表示该函数包含unique参数，当参数为true时，用于在程序运行时生成唯一的随机值。  
 **粗体** : 表示这是实体类，他的字段之间有更强的相关性。

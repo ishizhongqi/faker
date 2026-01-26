@@ -129,17 +129,17 @@ Person::Email      : KimberlyMullen.live@hotmail.com
 
 ## Modules
 
-| Module   | Functions                                                                                                                         |
-|:---------|:----------------------------------------------------------------------------------------------------------------------------------|
-| business | company_name, department, industry, **Company**                                                                                   |
-| computer | ip_address*, mac_address*, file_path, file_directory, file_name, file_extension, url*, hostname*, **File***                       |
-| datetime | date, time, datetime                                                                                                              |
-| location | address_line1, address_line2, postcode, full_address, city, region, **Location**                                                  |
-| number   | integer, unsigned_integer, decimal, decimal_string                                                                                |
-| payment  | payment_method, card_type, card_number*, card_date, **Card***                                                                     |
-| person   | first_name, last_name, full_name, gender, title, marital_status, phone_number*, email*, job_title, social_network_id, **Person*** |
-| product  | product_name, product_category, color, size, barcode*                                                                             |
-| string   | enum_item, text, uuid                                                                                                             |
+| Module   | Functions                                                                                                                          |
+|:---------|:-----------------------------------------------------------------------------------------------------------------------------------|
+| business | company_name, department, industry, **Company**                                                                                    |
+| computer | ip_address*, mac_address*, file_path, file_directory, file_name, file_extension, url*, hostname*, **File***                        |
+| datetime | date, time, datetime                                                                                                               |
+| location | address_line1, address_line2, postcode, full_address, city, region, **Location**                                                   |
+| number   | integer, unsigned_integer, decimal, decimal_string                                                                                 |
+| payment  | payment_method, card_type, card_number*, card_date, **Card***                                                                      |
+| person   | first_name, last_name, full_name, gender, title, marital_status, phone_number*, email*, job_title, social_network_id*, **Person*** |
+| product  | product_name, product_category, color, size, barcode*                                                                              |
+| string   | enum_item, text, uuid                                                                                                              |
 
 function* : Indicates that this function includes a unique parameter. When set to true, it enables the generation of
 unique random values during program runtime.  
