@@ -1,0 +1,99 @@
+name: clang
+
+on:
+  push:
+    branches:
+      - "develop"
+    paths-ignore:
+      - "**/*.md"
+      - "LICENSE"
+  pull_request:
+    branches:
+      - "develop"
+    paths-ignore:
+      - "**/*.md"
+      - "LICENSE"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ci_ubuntu-24.04_clang-18_${{ matrix.lib }}
+    runs-on: ubuntu-24.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        lib:
+          - static
+          - shared
+
+    steps:
+      # ----------------------------
+      # Checkout
+      # ----------------------------
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ----------------------------
+      # Install ccache
+      # ----------------------------
+      - name: Install ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+
+      # ----------------------------
+      # Install dependencies
+      # ----------------------------
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            cmake \
+            ninja-build \
+            clang-18 \
+            llvm-18 \
+            lld-18
+
+      # ----------------------------
+      # Select compiler
+      # ----------------------------
+      - name: Select compiler
+        run: |
+          echo "CC=clang-18" >> $GITHUB_ENV
+          echo "CXX=clang++-18" >> $GITHUB_ENV
+
+      # ----------------------------
+      # Configure
+      # ----------------------------
+      - name: Configure
+        run: |
+          cmake -S . -B build \
+            -G Ninja \
+            -DCMAKE_C_COMPILER=clang-18 \
+            -DCMAKE_CXX_COMPILER=clang++-18 \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_CXX_STANDARD=20 \
+            -DCMAKE_CXX_STANDARD_REQUIRED=ON \
+            -DCMAKE_CXX_EXTENSIONS=OFF \
+            -DFAKER_BUILD_SHARED=${{ matrix.lib == 'shared' && 'ON' || 'OFF' }} \
+            -DFAKER_BUILD_EXAMPLE=OFF \
+            -DFAKER_BUILD_TESTS=ON \
+            -DFAKER_CODE_COVERAGE=OFF
+
+      # ----------------------------
+      # Build
+      # ----------------------------
+      - name: Build
+        run: cmake --build build
+
+      # ----------------------------
+      # Test
+      # ----------------------------
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+
+      # ----------------------------
+      # Install check
+      # ----------------------------
+      - name: Install
+        run: cmake --install build --prefix install

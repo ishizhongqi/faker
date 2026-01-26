@@ -1,0 +1,66 @@
+name: coverage
+
+on:
+  push:
+    branches:
+      - "develop"
+    paths-ignore:
+      - "**/*.md"
+      - "LICENSE"
+  pull_request:
+    branches:
+      - "develop"
+    paths-ignore:
+      - "**/*.md"
+      - "LICENSE"
+  workflow_dispatch:
+
+jobs:
+  coverage:
+    name: ci_ubuntu-24.04_clang-18_coverage
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build clang-18 llvm-18
+
+      - name: Configure
+        env:
+          CC: clang-18
+          CXX: clang++-18
+        run: |
+          cmake -S . -B build \
+          -G Ninja \
+          -DCMAKE_C_COMPILER=clang-18 \
+          -DCMAKE_CXX_COMPILER=clang++-18 \
+          -DCMAKE_BUILD_TYPE=Debug \
+          -DCMAKE_CXX_STANDARD=20 \
+          -DCMAKE_CXX_STANDARD_REQUIRED=ON \
+          -DCMAKE_CXX_EXTENSIONS=OFF \
+          -DFAKER_BUILD_SHARED=OFF \
+          -DFAKER_BUILD_EXAMPLE=OFF \
+          -DFAKER_BUILD_TESTS=ON \
+          -DFAKER_CODE_COVERAGE=ON
+
+      - name: Build
+        run: cmake --build build
+
+      - name: Generate Coverage Data
+        run: cmake --build build --target ccov-all
+
+      - name: Export LCOV for Codecov
+        run: |
+          OBJ_FILES=$(cat build/ccov-data/objects/* | tr '\n' ' ')
+          PROF_DATA="build/ccov-data/ccov-all.profdata"
+          llvm-cov-18 export $OBJ_FILES -instr-profile=$PROF_DATA -format=lcov > coverage.info
+
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.info
+          fail_ci_if_error: true

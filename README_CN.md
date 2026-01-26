@@ -1,30 +1,23 @@
 # faker
 
-[![Clang](https://github.com/ishizhongqi/faker/actions/workflows/build-clang.yml/badge.svg?branch=develop)](https://github.com/ishizhongqi/faker/actions/workflows/build-clang.yml?query=branch%3Adevelop)
-[![GCC](https://github.com/ishizhongqi/faker/actions/workflows/build-gcc.yml/badge.svg?branch=develop)](https://github.com/ishizhongqi/faker/actions/workflows/build-gcc.yml?query=branch%3Adevelop)
-[![AppleClang](https://github.com/ishizhongqi/faker/actions/workflows/build-apple-clang.yml/badge.svg?branch=develop)](https://github.com/ishizhongqi/faker/actions/workflows/build-apple-clang.yml?query=branch%3Adevelop)
-[![MSVC](https://github.com/ishizhongqi/faker/actions/workflows/build-msvc.yml/badge.svg?branch=develop)](https://github.com/ishizhongqi/faker/actions/workflows/build-msvc.yml?query=branch%3Adevelop)
-[![codecov](https://codecov.io/gh/ishizhongqi/faker/branch/develop/graph/badge.svg?token=7HM692QH9A)](https://codecov.io/gh/ishizhongqi/faker)
+## 简介
 
-## Introduction
+**faker** 是一个用于生成虚假数据的 C++ 库。
 
-**faker** is a C++ library that generates fake data for you.
+在数据库测试中，经常会遇到需要生成测试数据的情况，这正是这个想法的来源。我注意到
+**_Navicat 的数据生成（Data Generation）_** 已经提供了类似的功能，但这是一个付费功能。
 
-In database testing, it’s common to run into situations where you need to generate test data that’s where this idea came
-from. I noticed that **_Navicat’s Data Generation_** already provides this functionality, but it’s a paid feature.
+我的计划是开发一个类似 **_Navicat 的数据生成（Data Generation）_** 的简单应用
+（当然，它不会像 Navicat 的专业工具那样功能丰富）。
+**faker** 库是该项目的一部分，因此 faker 的各个模块在设计上与 **_Navicat 的数据生成（Data Generation）_** 相似。
 
-My plan is to develop a simple and free application like **_Navicat’s Data Generation_**
-(of course, it won’t be as feature-rich as Navicat’s professional tool).
-The **faker** library is part of this project, So the faker's modules are quite similar to **_Navicat’s Data Generation_
-**.
+本项目还参考了一些其他流行的开源项目，例如
+[joke2k/faker](https://github.com/joke2k/faker) 以及
+[cieslarmichal/faker-cxx](https://github.com/cieslarmichal/faker-cxx) 。
 
-This project also references some other popular open-source projects, such as
-[joke2k/faker](https://github.com/joke2k/faker)  and
-[cieslarmichal/faker-cxx](https://github.com/cieslarmichal/faker-cxx) .
+## 使用方法
 
-## Usage
-
-### Compiler support
+### 编译器支持
 
 | Compiler                                                          | Minimum Version | Notes                               |
 |-------------------------------------------------------------------|-----------------|-------------------------------------|
@@ -33,9 +26,9 @@ This project also references some other popular open-source projects, such as
 | [Apple Clang](https://clang.llvm.org/)                            | Xcode 15+       | macOS                               |
 | [MSVC](https://visualstudio.microsoft.com/vs/features/cplusplus/) | 19.34           | Visual Studio 2022 (v143)           |
 
-### Add library
+### 添加库
 
-#### Option 1 : Git Submodule
+#### 方法一： Git Submodule
 
 ```shell
 mkdir third_party
@@ -44,7 +37,7 @@ git submodule add https://github.com/ishizhongqi/faker.git
 git submodule update --init --recursive
 ```
 
-Then in your `CMakeLists.txt`：
+然后在你的`CMakeLists.txt` 中加入以下内容:
 
 ```cmake
 add_subdirectory(third_party/faker)
@@ -53,7 +46,7 @@ add_executable(your_target main.cpp)
 target_link_libraries(your_target PRIVATE faker)
 ```
 
-#### Option 2 : FetchContent
+#### 方法二: FetchContent
 
 ```cmake
 include(FetchContent)
@@ -70,9 +63,9 @@ add_executable(your_target main.cpp)
 target_link_libraries(your_target PRIVATE faker)
 ```
 
-### Start your project
+### 开始你的项目
 
-[Source code](./example/main.cpp) :
+[源代码](example/main.cpp)：
 
 ```c++
 // You can include the full header <faker/faker.h>, or include individual module headers like <faker/number.h>.
@@ -115,7 +108,7 @@ int main() {
 
 ```
 
-Output example:
+输出示例：
 
 ```text
 First name: 凯 (Kai)
@@ -127,9 +120,9 @@ Person::Gender     : Female
 Person::Email      : KimberlyMullen.live@hotmail.com
 ```
 
-## Modules
+## 模块
 
-| Module   | Functions                                                                                                                         |
+| 模块       | 接口                                                                                                                                |
 |:---------|:----------------------------------------------------------------------------------------------------------------------------------|
 | business | company_name, department, industry, **Company**                                                                                   |
 | computer | ip_address*, mac_address*, file_path, file_directory, file_name, file_extension, url*, hostname*, **File***                       |
@@ -141,17 +134,16 @@ Person::Email      : KimberlyMullen.live@hotmail.com
 | product  | product_name, product_category, color, size, barcode*                                                                             |
 | string   | enum_item, text, uuid                                                                                                             |
 
-function* : Indicates that this function includes a unique parameter. When set to true, it enables the generation of
-unique random values during program runtime.  
-**Bold** : Indicates that this is an entity class, whose fields exhibit stronger interdependencies correlations.
+function* : 表示该函数包含unique参数，当参数为true时，用于在程序运行时生成唯一的随机值。  
+**粗体** : 表示这是实体类，他的字段之间有更强的相关性。
 
-Some data supports localization, currently supported languages are:
+部分数据支持本地化，目前支持的语言包括：
 
-- English
-- Simplified Chinese
-- Traditional Chinese
-- Japanese
+- 英语
+- 简体中文
+- 繁体中文
+- 日语
 
-## License
+## 许可证
 
-Licensed under the [MIT License](./LICENSE).
+本项目基于 [MIT License](LICENSE) 。
