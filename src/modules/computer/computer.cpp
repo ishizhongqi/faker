@@ -397,11 +397,12 @@ void File::roll() {
 
     if (extensions_.empty()) {
         path_ = folder_path + separator + file_name;
+        name_ = file_name;
     } else {
         path_ = folder_path + separator + file_name + "." + extension;
+        name_ = file_name + "." + extension;
     }
     directory_ = folder_path;
-    name_      = file_name + "." + extension;
     extension_ = extension;
 }
 
