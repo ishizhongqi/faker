@@ -34,6 +34,8 @@ static constexpr std::size_t card_number_format_count = kAmericanExpressCardNumb
                                                         kVisaCardNumberFormat.size();
 
 static std::vector<PermutationGenerator> card_number_pg_vector(card_number_format_count);
+static std::vector<uint64_t> card_number_capacity(card_number_format_count);
+static std::vector<uint8_t>  card_number_wildcards(card_number_format_count);
 
 static std::string g_card_date_format = "%m/%y";
 
@@ -154,10 +156,18 @@ std::string card_number(const CardTypes card_types, const bool unique) {
     std::string card_number;
 
     if (unique) {
-        const uint64_t wildcard_count = std::count(pattern.begin(), pattern.end(), '#');
-        uint64_t       capacity       = 1;
-        for (size_t i = 0; i < wildcard_count; ++i) { capacity *= 10; }
-        if (!card_number_pg_vector[seq_index].is_initialized()) { card_number_pg_vector[seq_index].initialize(0, capacity - 1); }
+        if (card_number_capacity[seq_index] == 0) {
+            const uint64_t wildcard_count = std::count(pattern.begin(), pattern.end(), '#');
+            uint64_t       capacity       = 1;
+            for (size_t i = 0; i < wildcard_count; ++i) { capacity *= 10; }
+            card_number_capacity[seq_index] = capacity;
+            card_number_wildcards[seq_index] = static_cast<uint8_t>(wildcard_count);
+        }
+        const uint64_t capacity = card_number_capacity[seq_index];
+        const uint64_t wildcard_count = card_number_wildcards[seq_index];
+        if (!card_number_pg_vector[seq_index].is_initialized()) {
+            card_number_pg_vector[seq_index].initialize(0, capacity - 1);
+        }
         const uint64_t    seq     = card_number_pg_vector[seq_index].next_uint64();
         const std::string seq_str = std::format("{:0{}}", seq, wildcard_count);
         card_number               = replace_wildcard_with_sequence(pattern, '#', seq_str);
@@ -203,12 +213,17 @@ std::string Card::date() const {
     return date_;
 }
 
+std::string Card::payment_method() const {
+    return payment_method_;
+}
+
 void Card::roll() {
     language_  = pick_language(languages_);
     card_type_ = pick_card_type(card_types_);
     type_      = std::string(kCardTypes.at(language_).at(card_type_));
     number_    = card_number(card_types_, unique_);
     date_      = get_card_date(start_, end_, location);
+    payment_method_ = "Credit Card";
 }
 
 }  // namespace faker::payment

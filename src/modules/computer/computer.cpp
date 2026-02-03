@@ -230,14 +230,17 @@ std::string file_directory(const OperatingSystems operating_systems) {
     case OperatingSystems::Linux: path_format = pick_one(kLinuxPathFormats); break;
     }
 
-    const auto        username = get_username();
-    std::string       extension;
-    const std::string base_path   = replace_placeholder(path_format, username);
-    std::string       folder_path = base_path;
+    const auto        username  = get_username();
+    const std::string base_path = replace_placeholder(path_format, username);
+    std::string       folder_path;
     const auto        file_type   = pick_file_type();
     const auto        folder_it   = kFoldersMap.find(file_type);
     const auto        folder      = folder_it == kFoldersMap.end() ? "" : folder_it->second;
-    folder_path                   = base_path + separator + std::string(folder) + separator;
+    if (folder.empty()) {
+        folder_path = base_path;
+    } else {
+        folder_path = base_path + separator + std::string(folder);
+    }
 
     return folder_path;
 }

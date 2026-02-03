@@ -31,6 +31,8 @@ static constexpr std::size_t barcode_format_count = kBarcodeEAN13Formats.size() 
                                                     kBarcodeISBNFormats.size();
 
 static std::vector<PermutationGenerator> barcode_pg_vector(barcode_format_count);
+static std::vector<uint64_t> barcode_capacity(barcode_format_count);
+static std::vector<uint8_t>  barcode_wildcards(barcode_format_count);
 
 std::string product_name(const Languages languages, const std::optional<std::span<const std::string_view>> keywords) {
     std::string_view keyword;
@@ -130,10 +132,18 @@ std::string barcode(const BarcodeTypes barcode_types, const bool unique) {
     std::string barcode;
 
     if (unique) {
-        const uint64_t wildcard_count = std::count(pattern.begin(), pattern.end(), '#');
-        uint64_t       capacity       = 1;
-        for (size_t i = 0; i < wildcard_count; ++i) { capacity *= 10; }
-        if (!barcode_pg_vector[seq_index].is_initialized()) { barcode_pg_vector[seq_index].initialize(0, capacity - 1); }
+        if (barcode_capacity[seq_index] == 0) {
+            const uint64_t wildcard_count = std::count(pattern.begin(), pattern.end(), '#');
+            uint64_t       capacity       = 1;
+            for (size_t i = 0; i < wildcard_count; ++i) { capacity *= 10; }
+            barcode_capacity[seq_index] = capacity;
+            barcode_wildcards[seq_index] = static_cast<uint8_t>(wildcard_count);
+        }
+        const uint64_t capacity = barcode_capacity[seq_index];
+        const uint64_t wildcard_count = barcode_wildcards[seq_index];
+        if (!barcode_pg_vector[seq_index].is_initialized()) {
+            barcode_pg_vector[seq_index].initialize(0, capacity - 1);
+        }
         const uint64_t    seq     = barcode_pg_vector[seq_index].next_uint64();
         const std::string seq_str = std::format("{:0{}}", seq, wildcard_count);
         barcode                   = replace_wildcard_with_sequence(pattern, '#', seq_str);

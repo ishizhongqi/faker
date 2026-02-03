@@ -32,6 +32,8 @@ static constexpr std::size_t phone_number_format_count = kUnitedStatesPhoneNumbe
                                                          kJapanPhoneNumberFormat.size();
 
 static std::vector<PermutationGenerator> phone_number_pg_vector(phone_number_format_count);
+static std::vector<uint64_t> phone_number_capacity(phone_number_format_count);
+static std::vector<uint8_t>  phone_number_wildcards(phone_number_format_count);
 
 static PermutationGenerator email_pg(0, 2176782336 - 1, PermutationGenerator::BaseN::Base36);              // 36^6 - 1
 
@@ -195,9 +197,15 @@ std::string
 
     // Generate a unique phone number if requested
     if (unique) {
-        const uint64_t wildcard_count = std::count(pattern.begin(), pattern.end(), '#');
-        uint64_t       capacity       = 1;
-        for (size_t i = 0; i < wildcard_count; ++i) { capacity *= 10; }
+        if (phone_number_capacity[seq_index] == 0) {
+            const uint64_t wildcard_count = std::count(pattern.begin(), pattern.end(), '#');
+            uint64_t       capacity       = 1;
+            for (size_t i = 0; i < wildcard_count; ++i) { capacity *= 10; }
+            phone_number_capacity[seq_index] = capacity;
+            phone_number_wildcards[seq_index] = static_cast<uint8_t>(wildcard_count);
+        }
+        const uint64_t capacity = phone_number_capacity[seq_index];
+        const uint64_t wildcard_count = phone_number_wildcards[seq_index];
         if (!phone_number_pg_vector[seq_index].is_initialized()) {
             phone_number_pg_vector[seq_index].initialize(0, capacity - 1);
         }
