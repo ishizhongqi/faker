@@ -132,6 +132,10 @@ public:
     /// @brief Get the issue or valid through date of the card.
     [[nodiscard]] std::string date() const;
 
+    /// @brief Get the payment method of the card.
+    /// @return Payment method string, always "Credit Card".
+    [[nodiscard]] std::string payment_method() const;
+
 private:
     // Location
     std::source_location location = std::source_location::current();
@@ -151,6 +155,7 @@ private:
     std::string type_;
     std::string number_;
     std::string date_;
+    std::string payment_method_;
 
     // Generates card data
     void roll();

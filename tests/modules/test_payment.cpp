@@ -73,10 +73,12 @@ TEST_P(CardTypeLanguagesTest, ShouldGenerateCard) {
     ASSERT_FALSE(card.type().empty());
     ASSERT_FALSE(card.number().empty());
     ASSERT_FALSE(card.date().empty());
+    ASSERT_EQ(card.payment_method(), "Credit Card");
     card.reroll();
     ASSERT_FALSE(card.type().empty());
     ASSERT_FALSE(card.number().empty());
     ASSERT_FALSE(card.date().empty());
+    ASSERT_EQ(card.payment_method(), "Credit Card");
 }
 
 INSTANTIATE_TEST_SUITE_P(
