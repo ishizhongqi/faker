@@ -18,8 +18,10 @@
 
 namespace faker::business {
 
+namespace {
+
 // Get a random industry
-static Industries pick_industry() {
+Industries pick_industry() {
     constexpr std::array industries = {
         Industries::Catering,
         Industries::Consulting,
@@ -42,7 +44,7 @@ static Industries pick_industry() {
 }
 
 // Get a company name
-static Bilingual get_company_name(const Languages language, const Industries industry) {
+Bilingual get_company_name(const Languages language, const Industries industry) {
     BilingualView business_words_view;
     if (const auto selected_language_it = kBusinessWords.find(language); selected_language_it != kBusinessWords.end()) {
         const auto& industries_map = selected_language_it->second;
@@ -112,7 +114,7 @@ static Bilingual get_company_name(const Languages language, const Industries ind
     return bilingual;
 }
 
-static std::string get_industry(const Languages languages, const Industries industry) {
+std::string get_industry(const Languages languages, const Industries industry) {
     std::string_view industry_string;
     if (const auto selected_language_it = kIndustries.find(languages); selected_language_it != kIndustries.end()) {
         const auto& industries_map = selected_language_it->second;
@@ -121,6 +123,8 @@ static std::string get_industry(const Languages languages, const Industries indu
     }
     return std::string(industry_string);
 }
+
+}  // namespace
 
 Bilingual company_name(const Languages languages) {
     const auto selected_language = pick_language(languages);

@@ -9,7 +9,6 @@
 
 #include <gtest/gtest.h>
 
-#include "faker/types/bilingual.h"
 #include "faker/types/enums.h"
 
 using namespace ::faker;

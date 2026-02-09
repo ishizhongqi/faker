@@ -25,22 +25,24 @@
 
 namespace faker::person {
 
+namespace {
+
 // unique
-static constexpr std::size_t phone_number_format_count = kUnitedStatesPhoneNumberFormat.size() +
-                                                         kUnitedKingdomPhoneNumberFormat.size() +
-                                                         kChinaPhoneNumberFormat.size() +
-                                                         kJapanPhoneNumberFormat.size();
+constexpr std::size_t phone_number_format_count = kUnitedStatesPhoneNumberFormat.size() +
+                                                  kUnitedKingdomPhoneNumberFormat.size() +
+                                                  kChinaPhoneNumberFormat.size() +
+                                                  kJapanPhoneNumberFormat.size();
 
-static std::vector<PermutationGenerator> phone_number_pg_vector(phone_number_format_count);
-static std::vector<uint64_t> phone_number_capacity(phone_number_format_count);
-static std::vector<uint8_t>  phone_number_wildcards(phone_number_format_count);
+std::vector<PermutationGenerator> phone_number_pg_vector(phone_number_format_count);
+std::vector<uint64_t>             phone_number_capacity(phone_number_format_count);
+std::vector<uint8_t>              phone_number_wildcards(phone_number_format_count);
 
-static PermutationGenerator email_pg(0, 2176782336 - 1, PermutationGenerator::BaseN::Base36);              // 36^6 - 1
+PermutationGenerator email_pg(0, 2176782336 - 1, PermutationGenerator::BaseN::Base36);              // 36^6 - 1
 
-static PermutationGenerator social_network_id_pg(0, 2176782336 - 1, PermutationGenerator::BaseN::Base36);  // 36^6 - 1
+PermutationGenerator social_network_id_pg(0, 2176782336 - 1, PermutationGenerator::BaseN::Base36);  // 36^6 - 1
 
-// Format full name
-static Bilingual format_full_name(const Languages language, const Bilingual& first_name, const Bilingual& last_name) {
+                                                                                                    // Format full name
+Bilingual format_full_name(const Languages language, const Bilingual& first_name, const Bilingual& last_name) {
     std::string full_name_original;
     std::string full_name_translation;
 
@@ -60,6 +62,8 @@ static Bilingual format_full_name(const Languages language, const Bilingual& fir
     auto full_name = Bilingual(full_name_original, full_name_translation);
     return full_name;
 }
+
+}  // namespace
 
 Bilingual first_name(const Languages languages, const Genders genders) {
     const auto selected_language = pick_language(languages);
@@ -201,10 +205,10 @@ std::string
             const uint64_t wildcard_count = std::count(pattern.begin(), pattern.end(), '#');
             uint64_t       capacity       = 1;
             for (size_t i = 0; i < wildcard_count; ++i) { capacity *= 10; }
-            phone_number_capacity[seq_index] = capacity;
+            phone_number_capacity[seq_index]  = capacity;
             phone_number_wildcards[seq_index] = static_cast<uint8_t>(wildcard_count);
         }
-        const uint64_t capacity = phone_number_capacity[seq_index];
+        const uint64_t capacity       = phone_number_capacity[seq_index];
         const uint64_t wildcard_count = phone_number_wildcards[seq_index];
         if (!phone_number_pg_vector[seq_index].is_initialized()) {
             phone_number_pg_vector[seq_index].initialize(0, capacity - 1);

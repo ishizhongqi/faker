@@ -5,6 +5,7 @@ set(FAKER_SOURCES
         types/permutation_generator.cpp
         core/random_engine.cpp
         utils/random_helper.cpp
+        utils/safe_localtime.cpp
         utils/string_helper.cpp
         utils/validation.cpp
         modules/business/business.cpp
@@ -22,6 +23,7 @@ set(FAKER_HEADERS
         core/random_engine.h
         types/permutation_generator.h
         utils/random_helper.h
+        utils/safe_localtime.h
         utils/string_helper.h
         utils/validation.h
         modules/business/business_data.h

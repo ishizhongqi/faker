@@ -18,7 +18,9 @@
 
 namespace faker::location {
 
-static AddressComponents pick_address_component(const Regions region) {
+namespace {
+
+AddressComponents pick_address_component(const Regions region) {
     AddressComponents address_components;
     switch (region) {
     case Regions::UnitedStates : address_components = pick_one(kUnitedStatesAddressComponents); break;
@@ -29,7 +31,7 @@ static AddressComponents pick_address_component(const Regions region) {
     return address_components;
 }
 
-static BilingualView get_city(const Regions region, const AddressComponents& address_components) {
+BilingualView get_city(const Regions region, const AddressComponents& address_components) {
     int city_level = 1;
     switch (region) {
     case Regions::UnitedStates : city_level = KUnitedStatesCityLevel; break;
@@ -43,7 +45,7 @@ static BilingualView get_city(const Regions region, const AddressComponents& add
     return address_components.admin_levels[city_level];
 }
 
-static std::tuple<std::string, Bilingual, Bilingual, Bilingual>
+std::tuple<std::string, Bilingual, Bilingual, Bilingual>
     format_address(const Regions region, const AddressComponents& address_components) {
     std::string postcode = replace_wildcard_with_letter(
         replace_wildcard_with_digit(address_components.postcode),
@@ -198,6 +200,8 @@ static std::tuple<std::string, Bilingual, Bilingual, Bilingual>
 
     return std::make_tuple(postcode, address_line1, address_line2, full_address);
 }
+
+}  // namespace
 
 Bilingual address_line1(const Regions regions) {
     const auto selected_region   = pick_region(regions);

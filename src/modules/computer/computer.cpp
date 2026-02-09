@@ -26,14 +26,16 @@
 
 namespace faker::computer {
 
-static PermutationGenerator ipv4_pg(20000000ULL, 4000000000ULL - 1);
-static PermutationGenerator ipv6_low_pg(20000000000000000ULL, 200000000000000000ULL - 1);
-static PermutationGenerator mac_pg(100000000ULL, 100000000000ULL - 1);
+namespace {
 
-static PermutationGenerator url_pg(0, 2176782336 - 1, PermutationGenerator::BaseN::Base36);       //  36^6 - 1
-static PermutationGenerator hostname_pg(0, 2176782336 - 1, PermutationGenerator::BaseN::Base36);  //  36^6 - 1
+PermutationGenerator ipv4_pg(20000000ULL, 4000000000ULL - 1);
+PermutationGenerator ipv6_low_pg(20000000000000000ULL, 200000000000000000ULL - 1);
+PermutationGenerator mac_pg(100000000ULL, 100000000000ULL - 1);
 
-static FileTypes pick_file_type() {
+PermutationGenerator url_pg(0, 2176782336 - 1, PermutationGenerator::BaseN::Base36);       //  36^6 - 1
+PermutationGenerator hostname_pg(0, 2176782336 - 1, PermutationGenerator::BaseN::Base36);  //  36^6 - 1
+
+FileTypes pick_file_type() {
     constexpr std::array file_types = {
         FileTypes::Application,
         FileTypes::Archive,
@@ -55,7 +57,7 @@ static FileTypes pick_file_type() {
     return random_file_type;
 }
 
-static std::string get_username() {
+std::string get_username() {
     auto const selected_name_language = pick_language(
         Languages::English | Languages::SimplifiedChinese | Languages::TraditionalChinese | Languages::Japanese
     );
@@ -73,6 +75,8 @@ static std::string get_username() {
     }
     return std::string(username);
 }
+
+}  // namespace
 
 std::string ip_address(const IpAddressType ip_address_type, const bool unique) {
     std::mt19937_64& random_engine = get_random_engine();
@@ -233,9 +237,9 @@ std::string file_directory(const OperatingSystems operating_systems) {
     const auto        username  = get_username();
     const std::string base_path = replace_placeholder(path_format, username);
     std::string       folder_path;
-    const auto        file_type   = pick_file_type();
-    const auto        folder_it   = kFoldersMap.find(file_type);
-    const auto        folder      = folder_it == kFoldersMap.end() ? "" : folder_it->second;
+    const auto        file_type = pick_file_type();
+    const auto        folder_it = kFoldersMap.find(file_type);
+    const auto        folder    = folder_it == kFoldersMap.end() ? "" : folder_it->second;
     if (folder.empty()) {
         folder_path = base_path;
     } else {

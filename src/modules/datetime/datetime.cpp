@@ -7,10 +7,10 @@
 #include "faker/datetime.h"
 
 #include <chrono>
+#include <ctime>
 #include <iomanip>
 #include <locale>
 #include <random>
-#include <regex>
 #include <source_location>
 #include <sstream>
 #include <stdexcept>
@@ -19,22 +19,25 @@
 
 #include "faker/types/enums.h"
 #include "random_engine.h"
+#include "safe_localtime.h"
 #include "validation.h"
 
 namespace faker::datetime {
 
-static std::string g_date_format = "%Y-%m-%d";
-static std::string g_time_format = "%H:%M:%S";
+namespace {
+
+std::string g_date_format = "%Y-%m-%d";
+std::string g_time_format = "%H:%M:%S";
 
 enum class DateTimeFlag { Date, Time };
 
-static std::tm now() {
+std::tm now() {
     const std::time_t now = std::time(nullptr);
-    return *std::localtime(&now);
+    return get_safe_localtime(now);
 }
 
 // Parse date string to tm
-static std::tm parse_time(
+std::tm parse_time(
     const std::string&          dt,
     const DateTimeFlag          dt_flag,
     const std::source_location& location = std::source_location::current()
@@ -70,7 +73,7 @@ static std::tm parse_time(
 }
 
 // Check if the given tm is in the allowed weekday
-static bool is_allowed_weekday(const std::tm& tm, const DaysOfWeek allowed) {
+bool is_allowed_weekday(const std::tm& tm, const DaysOfWeek allowed) {
     static constexpr DaysOfWeek mapping[] = {
         DaysOfWeek::Sunday,
         DaysOfWeek::Monday,
@@ -84,14 +87,14 @@ static bool is_allowed_weekday(const std::tm& tm, const DaysOfWeek allowed) {
 }
 
 // Format date tm to string
-static std::string format_time(const std::tm& tm, const DateTimeFlag dt_flag) {
+std::string format_time(const std::tm& tm, const DateTimeFlag dt_flag) {
     std::ostringstream     stream;
     const std::string_view format = dt_flag == DateTimeFlag::Date ? g_date_format : g_time_format;
     stream << std::put_time(&tm, std::string(format).c_str());
     return stream.str();
 }
 
-static std::string get_date(
+std::string get_date(
     const std::string_view      start,
     const std::string_view      end,
     const DaysOfWeek            days_of_week,
@@ -117,7 +120,7 @@ static std::string get_date(
 
         for (int i = 0; i < span_days; ++i) {
             std::time_t tt = start_date + i * seconds_per_day;
-            if (std::tm tm = *std::localtime(&tt); is_allowed_weekday(tm, days_of_week)) { candidates.push_back(tt); }
+            if (std::tm tm = get_safe_localtime(tt); is_allowed_weekday(tm, days_of_week)) { candidates.push_back(tt); }
         }
 
         if (candidates.empty()) {
@@ -128,26 +131,26 @@ static std::string get_date(
         }
 
         std::uniform_int_distribution<size_t> distribution(0, candidates.size() - 1);
-        const std::tm                         random_tm = *std::localtime(&candidates[distribution(random_engine)]);
+        const std::tm                         random_tm = get_safe_localtime(candidates[distribution(random_engine)]);
         return format_time(random_tm, DateTimeFlag::Date);
     }
 
     // If span_days >= 7
     std::uniform_int_distribution distribution(start_date, end_date);
     const auto                    random_time = distribution(random_engine);
-    const std::tm                 random_tm   = *std::localtime(&random_time);
+    const std::tm                 random_tm   = get_safe_localtime(random_time);
     if (is_allowed_weekday(random_tm, days_of_week)) { return format_time(random_tm, DateTimeFlag::Date); }
     for (int offset = 1; offset < span_days; ++offset) {
         // try forward
         std::time_t forward = random_time + offset * seconds_per_day;
         if (forward <= end_date) {
-            std::tm tm_forward = *std::localtime(&forward);
+            std::tm tm_forward = get_safe_localtime(forward);
             if (is_allowed_weekday(tm_forward, days_of_week)) { return format_time(tm_forward, DateTimeFlag::Date); }
         }
         // try backward
         std::time_t backward = random_time - offset * seconds_per_day;
         if (backward >= start_date) {
-            std::tm tm_backward = *std::localtime(&backward);
+            std::tm tm_backward = get_safe_localtime(backward);
             if (is_allowed_weekday(tm_backward, days_of_week)) { return format_time(tm_backward, DateTimeFlag::Date); }
         }
     }
@@ -155,7 +158,7 @@ static std::string get_date(
     throw_exception<std::runtime_error>("Unable to find a valid weekday in the expanded search.", location);
 }
 
-static std::string get_time(
+std::string get_time(
     const std::string_view      start,
     const std::string_view      end,
     const std::source_location& location = std::source_location::current()
@@ -171,10 +174,12 @@ static std::string get_time(
     std::mt19937_64&              random_engine = get_random_engine();
     std::uniform_int_distribution distribution(start_time, end_time);
     const auto                    random_time = distribution(random_engine);
-    const std::tm                 random_tm   = *std::localtime(&random_time);
+    const std::tm                 random_tm   = get_safe_localtime(random_time);
 
     return format_time(random_tm, DateTimeFlag::Time);
 }
+
+}  // namespace
 
 std::string date(const std::string_view start_date, const std::string_view end_date, const DaysOfWeek days_of_week) {
     CHECK_EMPTY(std::invalid_argument, start_date);

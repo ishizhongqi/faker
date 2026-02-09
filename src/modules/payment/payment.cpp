@@ -22,30 +22,32 @@
 #include "permutation_generator.h"
 #include "random_engine.h"
 #include "random_helper.h"
+#include "safe_localtime.h"
 #include "string_helper.h"
 #include "validation.h"
 
 namespace faker::payment {
 
-static constexpr std::size_t card_number_format_count = kAmericanExpressCardNumberFormat.size() +
-                                                        kJCBCardNumberFormat.size() +
-                                                        kMasterCardNumberFormat.size() +
-                                                        kUnionPayCardNumberFormat.size() +
-                                                        kVisaCardNumberFormat.size();
+namespace {
 
-static std::vector<PermutationGenerator> card_number_pg_vector(card_number_format_count);
-static std::vector<uint64_t> card_number_capacity(card_number_format_count);
-static std::vector<uint8_t>  card_number_wildcards(card_number_format_count);
+constexpr std::size_t card_number_format_count = kAmericanExpressCardNumberFormat.size() +
+                                                 kJCBCardNumberFormat.size() +
+                                                 kMasterCardNumberFormat.size() +
+                                                 kUnionPayCardNumberFormat.size() +
+                                                 kVisaCardNumberFormat.size();
 
-static std::string g_card_date_format = "%m/%y";
+std::vector<PermutationGenerator> card_number_pg_vector(card_number_format_count);
+std::vector<uint64_t>             card_number_capacity(card_number_format_count);
+std::vector<uint8_t>              card_number_wildcards(card_number_format_count);
 
-static std::tm now() {
+std::string g_card_date_format = "%m/%y";
+
+std::tm now() {
     const std::time_t now = std::time(nullptr);
-    return *std::localtime(&now);
+    return get_safe_localtime(now);
 }
 
-static std::tm
-    parse_time(const std::string& dt, const std::source_location& location = std::source_location::current()) {
+std::tm parse_time(const std::string& dt, const std::source_location& location = std::source_location::current()) {
     std::tm tm{};
     tm          = now();
     tm.tm_isdst = -1;
@@ -69,14 +71,14 @@ static std::tm
     return tm;
 }
 
-static std::string format_time(const std::tm& tm) {
+std::string format_time(const std::tm& tm) {
     std::ostringstream     stream;
     const std::string_view format = g_card_date_format;
     stream << std::put_time(&tm, std::string(format).c_str());
     return stream.str();
 }
 
-static std::string get_card_date(
+std::string get_card_date(
     const std::string_view      start_date,
     const std::string_view      end_date,
     const std::source_location& location = std::source_location::current()
@@ -92,10 +94,12 @@ static std::string get_card_date(
     std::mt19937_64&              random_engine = get_random_engine();
     std::uniform_int_distribution distribution(start, end);
     const auto                    random_time = distribution(random_engine);
-    const std::tm                 random_tm   = *std::localtime(&random_time);
+    const std::tm                 random_tm   = get_safe_localtime(random_time);
 
     return format_time(random_tm);
 }
+
+}  // namespace
 
 std::string payment_method(std::optional<std::span<const std::string_view>> payment_methods) {
     if (payment_methods.has_value()) {
@@ -160,10 +164,10 @@ std::string card_number(const CardTypes card_types, const bool unique) {
             const uint64_t wildcard_count = std::count(pattern.begin(), pattern.end(), '#');
             uint64_t       capacity       = 1;
             for (size_t i = 0; i < wildcard_count; ++i) { capacity *= 10; }
-            card_number_capacity[seq_index] = capacity;
+            card_number_capacity[seq_index]  = capacity;
             card_number_wildcards[seq_index] = static_cast<uint8_t>(wildcard_count);
         }
-        const uint64_t capacity = card_number_capacity[seq_index];
+        const uint64_t capacity       = card_number_capacity[seq_index];
         const uint64_t wildcard_count = card_number_wildcards[seq_index];
         if (!card_number_pg_vector[seq_index].is_initialized()) {
             card_number_pg_vector[seq_index].initialize(0, capacity - 1);
@@ -218,11 +222,11 @@ std::string Card::payment_method() const {
 }
 
 void Card::roll() {
-    language_  = pick_language(languages_);
-    card_type_ = pick_card_type(card_types_);
-    type_      = std::string(kCardTypes.at(language_).at(card_type_));
-    number_    = card_number(card_types_, unique_);
-    date_      = get_card_date(start_, end_, location);
+    language_       = pick_language(languages_);
+    card_type_      = pick_card_type(card_types_);
+    type_           = std::string(kCardTypes.at(language_).at(card_type_));
+    number_         = card_number(card_types_, unique_);
+    date_           = get_card_date(start_, end_, location);
     payment_method_ = "Credit Card";
 }
 

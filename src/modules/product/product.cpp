@@ -24,15 +24,18 @@
 
 namespace faker::product {
 
-static constexpr std::size_t barcode_format_count = kBarcodeEAN13Formats.size() +
-                                                    kBarcodeEAN8Formats.size() +
-                                                    kBarcodeUPCAFormats.size() +
-                                                    kBarcodeUPCEFormats.size() +
-                                                    kBarcodeISBNFormats.size();
+namespace {
+constexpr std::size_t barcode_format_count = kBarcodeEAN13Formats.size() +
+                                             kBarcodeEAN8Formats.size() +
+                                             kBarcodeUPCAFormats.size() +
+                                             kBarcodeUPCEFormats.size() +
+                                             kBarcodeISBNFormats.size();
 
-static std::vector<PermutationGenerator> barcode_pg_vector(barcode_format_count);
-static std::vector<uint64_t> barcode_capacity(barcode_format_count);
-static std::vector<uint8_t>  barcode_wildcards(barcode_format_count);
+std::vector<PermutationGenerator> barcode_pg_vector(barcode_format_count);
+std::vector<uint64_t>             barcode_capacity(barcode_format_count);
+std::vector<uint8_t>              barcode_wildcards(barcode_format_count);
+
+}  // namespace
 
 std::string product_name(const Languages languages, const std::optional<std::span<const std::string_view>> keywords) {
     std::string_view keyword;
@@ -136,10 +139,10 @@ std::string barcode(const BarcodeTypes barcode_types, const bool unique) {
             const uint64_t wildcard_count = std::count(pattern.begin(), pattern.end(), '#');
             uint64_t       capacity       = 1;
             for (size_t i = 0; i < wildcard_count; ++i) { capacity *= 10; }
-            barcode_capacity[seq_index] = capacity;
+            barcode_capacity[seq_index]  = capacity;
             barcode_wildcards[seq_index] = static_cast<uint8_t>(wildcard_count);
         }
-        const uint64_t capacity = barcode_capacity[seq_index];
+        const uint64_t capacity       = barcode_capacity[seq_index];
         const uint64_t wildcard_count = barcode_wildcards[seq_index];
         if (!barcode_pg_vector[seq_index].is_initialized()) {
             barcode_pg_vector[seq_index].initialize(0, capacity - 1);

@@ -17,8 +17,10 @@
 
 namespace faker::number {
 
+namespace {
+
 // Generate a random decimal string.
-static std::string GetDecimalString(
+std::string GetDecimalString(
     const double                start,
     const double                end,
     const int                   decimal_places,
@@ -44,6 +46,8 @@ static std::string GetDecimalString(
     oss << std::fixed << std::setprecision(decimal_places) << static_cast<double>(raw_value) / factor;
     return oss.str();
 }
+
+}  // namespace
 
 template <std::integral T>
     requires(std::is_signed_v<T>)
