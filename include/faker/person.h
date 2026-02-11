@@ -21,9 +21,9 @@ namespace faker::person {
 
 /// @brief Generates a random first name.
 /// @param languages The languages of the first name. Defaults to Languages::English.
-///                  If multiple languages are specified, bitwise(bitwise_or |) operator can be used.
+///                  If multiple languages are specified, the bitwise OR (`|`) operator can be used.
 /// @param genders The genders. Defaults to Genders::M | Genders::F.
-///                If multiple genders are specified, bitwise(bitwise_or |) operator can be used.
+///                If multiple genders are specified, the bitwise OR (`|`) operator can be used.
 /// @return A first name.
 /// @note You need to use class @code faker::Bilingual@endcode to get first name.
 /// @code
@@ -37,7 +37,7 @@ FAKER_EXPORT Bilingual first_name(Languages languages = Languages::English, Gend
 
 /// @brief Generates a random last name.
 /// @param languages The languages of the last name. Defaults to Languages::English.
-///                  If multiple languages are specified, bitwise(bitwise_or |) operator can be used.
+///                  If multiple languages are specified, the bitwise OR (`|`) operator can be used.
 /// @return A last name.
 /// @note You need to use class @code faker::Bilingual@endcode to get last name.
 /// @code
@@ -50,9 +50,9 @@ FAKER_EXPORT Bilingual last_name(Languages languages = Languages::English);
 
 /// @brief Generates a full name.
 /// @param languages The languages of the full name. Defaults to Languages::English.
-///                  If multiple languages are specified, bitwise(bitwise_or |) operator can be used.
+///                  If multiple languages are specified, the bitwise OR (`|`) operator can be used.
 /// @param genders The genders. Defaults to Genders::M | Genders::F.
-///                If multiple genders are specified, bitwise(bitwise_or |) operator can be used.
+///                If multiple genders are specified, the bitwise OR (`|`) operator can be used.
 /// @return A full name.
 /// @note You need to use class @code faker::Bilingual@endcode to get full name.
 /// @code
@@ -66,7 +66,7 @@ FAKER_EXPORT Bilingual full_name(Languages languages = Languages::English, Gende
 
 /// @brief Generates a random gender.
 /// @param languages The languages of the gender. Defaults to Languages::English.
-///                  If multiple languages are specified, bitwise(bitwise_or |) operator can be used.
+///                  If multiple languages are specified, the bitwise OR (`|`) operator can be used.
 /// @return A gender.
 /// @code
 /// faker::person::gender();  // "Female"
@@ -76,9 +76,9 @@ FAKER_EXPORT std::string gender(Languages languages = Languages::English);
 
 /// @brief Generates a random title.
 /// @param languages The languages of the title. Defaults to Languages::English.
-///                  If multiple languages are specified, bitwise(bitwise_or |) operator can be used.
+///                  If multiple languages are specified, the bitwise OR (`|`) operator can be used.
 /// @param genders The genders. Defaults to Genders::M | Genders::F.
-///                If multiple genders are specified, bitwise(bitwise_or |) operator can be used.
+///                If multiple genders are specified, the bitwise OR (`|`) operator can be used.
 /// @return A title.
 /// @code
 /// faker::person::title();  // "Prof."
@@ -94,7 +94,7 @@ FAKER_EXPORT std::string title(Languages languages = Languages::English, Genders
 
 /// @brief Generates a random marital status.
 /// @param languages The languages of the marital status. Defaults to Languages::English.
-///                  If multiple languages are specified, bitwise(bitwise_or |) operator can be used.
+///                  If multiple languages are specified, the bitwise OR (`|`) operator can be used.
 /// @return Marital status.
 /// @code
 /// faker::person::marital_status();  // "Single"
@@ -106,7 +106,7 @@ FAKER_EXPORT std::string marital_status(Languages languages = Languages::English
 /// @param is_international Whether the phone number format is international. Defaults to false.
 /// @param include_delimiters Whether to include delimiters such as '-' or spaces. Defaults to true.
 /// @param regions Regions. Defaults to Regions::UnitedStates.
-///                If multiple regions are specified, bitwise(bitwise_or |) operator can be used.
+///                If multiple regions are specified, the bitwise OR (`|`) operator can be used.
 /// @param unique Whether to generate a unique phone number. Defaults to false.
 /// @return A phone number string.
 /// @code
@@ -124,9 +124,9 @@ FAKER_EXPORT std::string phone_number(
 
 /// @brief Generates a random email.
 /// @param languages The languages of the email. Defaults to Languages::English.
-///                  If multiple languages are specified, bitwise(bitwise_or |) operator can be used.
+///                  If multiple languages are specified, the bitwise OR (`|`) operator can be used.
 /// @param domains The list of domains. Defaults to std::nullopt, equivalent to {"gmail.com", "outlook.com"}.
-///                If empty, throw error.
+///                If empty, throws an error.
 /// @param unique Whether to generate a unique email. Defaults to false.
 /// @return An email.
 /// @code
@@ -143,7 +143,7 @@ FAKER_EXPORT std::string email(
 
 /// @brief Generates a random job title.
 /// @param languages The languages of the job title. Defaults to Languages::English.
-///                  If multiple languages are specified, bitwise(bitwise_or |) operator can be used.
+///                  If multiple languages are specified, the bitwise OR (`|`) operator can be used.
 /// @return A job title.
 /// @code
 /// faker::person::job_title();  // "Electrical Engineer"
@@ -153,7 +153,7 @@ FAKER_EXPORT std::string job_title(Languages languages = Languages::English);
 
 /// @brief Generates a random social network ID.
 /// @param languages The languages of the social network ID. Defaults to Languages::English.
-///                  If multiple languages are specified, bitwise(bitwise_or |) operator can be used.
+///                  If multiple languages are specified, the bitwise OR (`|`) operator can be used.
 /// @param unique Whether to generate a unique social network ID. Defaults to false.
 /// @return A social network ID.
 /// @code
@@ -200,14 +200,14 @@ class FAKER_EXPORT Person {
 public:
     /// @brief Constructs a person entity.
     /// @param genders The genders. Defaults to Genders::M | Genders::F.
-    ///                If multiple genders are specified, bitwise(bitwise_or |) operator can be used.
+    ///                If multiple genders are specified, the bitwise OR (`|`) operator can be used.
     /// @param languages The languages. Defaults to Languages::English.
-    ///                  If multiple languages are specified, bitwise(bitwise_or |) operator can be used.
+    ///                  If multiple languages are specified, the bitwise OR (`|`) operator can be used.
     /// @param regions Regions. Defaults to Regions::UnitedStates.
-    ///                             If multiple regions are specified, bitwise(bitwise_or |) operator can be used.
+    ///                             If multiple regions are specified, the bitwise OR (`|`) operator can be used.
     /// @param email_domains The list of domains. Defaults to std::nullopt, equivalent to {"gmail.com"}.
-    ///                      If empty, throw error.
-    /// @param unique Whether to generate a unique data.
+    ///                      If empty, throws an error.
+    /// @param unique Whether to generate unique data.
     ///               Supported data: phone_number, email, social_network_id.
     ///               Defaults to false.
     /// @note The unique option has a runtime generation limit. Exceeding it may cause errors.

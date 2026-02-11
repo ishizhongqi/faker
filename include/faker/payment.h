@@ -20,8 +20,8 @@ namespace faker::payment {
 
 /// @brief Generates a random payment method.
 /// @param payment_methods The list of payment methods.
-///                        Defaults to nullopt, equivalent to {"Credit Card", "PayPal", "Apple Pay"}.
-///                        If empty, throw error.
+///                        Defaults to std::nullopt, equivalent to {"Credit Card", "PayPal", "Apple Pay"}.
+///                        If empty, throws an error.
 /// @return A payment method.
 /// @code
 /// faker::payment::payment_method();  // "PayPal"
@@ -33,11 +33,11 @@ FAKER_EXPORT std::string payment_method(
 
 /// @brief Generates a random card type.
 /// @param languages The languages of card type. Defaults to Languages::English.
-///                  If multiple languages are specified, bitwise(bitwise_or |) operator can be used.
+///                  If multiple languages are specified, the bitwise OR (`|`) operator can be used.
 /// @param card_types The selected card types.
 ///                   Defaults to CardTypes::AmericanExpress, CardTypes::JCB,
 ///                   CardTypes::MasterCard, CardTypes::UnionPay and CardTypes::Visa.
-///                   If multiple card types are specified, bitwise(bitwise_or |) operator can be used.
+///                   If multiple card types are specified, the bitwise OR (`|`) operator can be used.
 /// @return A card type string.
 /// @code
 /// faker::payment::card_type();  // "American Express"
@@ -54,7 +54,7 @@ FAKER_EXPORT std::string card_type(
 
 /// @brief Generates a random card number.
 /// @param card_types The selected card types.
-///                   If multiple card types are specified, bitwise(bitwise_or |) operator can be used.
+///                   If multiple card types are specified, the bitwise OR (`|`) operator can be used.
 ///                   Defaults to CardTypes::AmericanExpress, CardTypes::JCB,
 ///                   CardTypes::MasterCard, CardTypes::UnionPay and CardTypes::Visa.
 /// @param unique Whether to generate a unique card number. Defaults to false.
@@ -98,13 +98,13 @@ FAKER_EXPORT std::string card_date(
 /// @endcode
 class FAKER_EXPORT Card {
 public:
-    /// @brief Construct a card entity.
+    /// @brief Constructs a card entity.
     /// @param languages The language of card type. Defaults to Languages::English.
-    ///                  If multiple languages are specified, bitwise(bitwise_or |) operator can be used.
+    ///                  If multiple languages are specified, the bitwise OR (`|`) operator can be used.
     /// @param card_types The selected card types.
     ///                   Defaults to CardTypes::AmericanExpress, CardTypes::JCB,
     ///                   CardTypes::MasterCard, CardTypes::UnionPay and CardTypes::Visa.
-    ///                   If multiple card types are specified, bitwise(bitwise_or |) operator can be used.
+    ///                   If multiple card types are specified, the bitwise OR (`|`) operator can be used.
     /// @param start_month The start month in the format of "mm/YY". Defaults to "01/00".
     /// @param end_month The end month in the format of "mm/YY". Defaults to "12/50".
     /// @param unique Whether to generate a unique card number.
@@ -126,16 +126,16 @@ public:
     /// @brief Regenerates card data.
     void reroll();
 
-    /// @brief Get the type of the card.
+    /// @brief Gets the type of the card.
     [[nodiscard]] std::string type() const;
 
-    /// @brief Get the number of the card.
+    /// @brief Gets the number of the card.
     [[nodiscard]] std::string number() const;
 
-    /// @brief Get the issue or valid through date of the card.
+    /// @brief Gets the issue date or "valid through" date of the card.
     [[nodiscard]] std::string date() const;
 
-    /// @brief Get the payment method of the card.
+    /// @brief Gets the payment method of the card.
     /// @return Payment method string, always "Credit Card".
     [[nodiscard]] std::string payment_method() const;
 

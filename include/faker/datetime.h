@@ -16,11 +16,11 @@ namespace faker::datetime {
 
 /// @brief Generates a random date string between start_date and end_date, filtering by specified days of the week.
 /// @param start_date The start date string in the format of "%Y-%m-%d". Defaults to "1970-01-01".
-///                   If empty, throw error.
+///                   If empty, throws an error.
 /// @param end_date The end date string in the format of "%Y-%m-%d". Defaults to "2050-12-31".
-///                 If empty, throw error.
+///                 If empty, throws an error.
 /// @param days_of_week Days of the week. Defaults to DaysOfWeek::Sunday through DaysOfWeek::Saturday.
-///                     If multiple days are specified, bitwise(bitwise_or |) operator can be used.
+///                     If multiple days are specified, the bitwise OR (`|`) operator can be used.
 /// @return A date string in the format of "%Y-%m-%d".
 /// @code
 /// faker::datetime::date();  // "2011-08-23"
@@ -41,9 +41,9 @@ FAKER_EXPORT std::string date(
 
 /// @brief Generates a random time string between start_time and end_time.
 /// @param start_time The start time string in the format of "%H:%M:%S". Defaults to "00:00:00".
-///                   If empty, throw error.
+///                   If empty, throws an error.
 /// @param end_time The end time string in the format of "%H:%M:%S". Defaults to "23:59:59".
-///                 If empty, throw error.
+///                 If empty, throws an error.
 /// @return A time string in the format of "%H:%M:%S".
 /// @code
 /// faker::datetime::time();  // "16:59:12"
@@ -54,15 +54,15 @@ FAKER_EXPORT std::string time(std::string_view start_time = "00:00:00", std::str
 /// @brief Generates a random datetime string between start_date and end_date,
 ///        filtering by specified days of the week and between start_time and end_time.
 /// @param start_date The start date string in the format of "%Y-%m-%d".
-///                   If empty, throw error.
+///                   If empty, throws an error.
 /// @param end_date The end date string in the format of "%Y-%m-%d".
-///                 If empty, throw error.
+///                 If empty, throws an error.
 /// @param start_time The start time string in the format of "%H:%M:%S".
-///                   If empty, throw error.
+///                   If empty, throws an error.
 /// @param end_time The end time string in the format of "%H:%M:%S".
-///                 If empty, throw error.
+///                 If empty, throws an error.
 /// @param days_of_week Days of the week. Defaults to DaysOfWeek::Sunday through DaysOfWeek::Saturday.
-///                     If multiple days are specified, bitwise(bitwise_or |) operator can be used.
+///                     If multiple days are specified, the bitwise OR (`|`) operator can be used.
 /// @return A datetime string in the format of "%Y-%m-%d %H:%M:%S".
 /// @code
 /// faker::datetime::datetime();  // "2012-04-12 17:04:23"

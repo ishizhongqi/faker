@@ -12,7 +12,7 @@
 namespace faker {
 
 /// @brief Days of the week.
-///  If you want to use multiple days, you can use bitwise(bitwise_or |) operators.
+///  If you want to use multiple days, you can use the bitwise OR (`|`) operator.
 enum class DaysOfWeek {
     Sunday    = 1 << 0,  // Sunday
     Monday    = 1 << 1,  // Monday
@@ -26,7 +26,7 @@ template <>
 struct enable_bitwise_operators<DaysOfWeek> : std::true_type {};
 
 /// @brief Languages.
-///  If you want to use multiple languages, you can use bitwise(bitwise_or |) operators.
+///  If you want to use multiple languages, you can use the bitwise OR (`|`) operator.
 enum class Languages {
     English            = 1 << 0,  // English
     SimplifiedChinese  = 1 << 1,  // Simplified Chinese
@@ -37,7 +37,7 @@ template <>
 struct enable_bitwise_operators<Languages> : std::true_type {};
 
 /// @brief Regions
-///  If you want to use multiple regions, you can use bitwise(bitwise_or |) operators.
+///  If you want to use multiple regions, you can use the bitwise OR (`|`) operator.
 enum class Regions {
     UnitedStates  = 1 << 0,  // United States
     UnitedKingdom = 1 << 1,  // United Kingdom
@@ -55,13 +55,13 @@ enum class CountryCodesStandard {
 };
 
 /// @brief Gender
-///  If you want to use multiple genders, you can use bitwise(bitwise_or |) operators.
+///  If you want to use multiple genders, you can use the bitwise OR (`|`) operator.
 enum class Genders { M = 1 << 0, F = 1 << 1 };
 template <>
 struct enable_bitwise_operators<Genders> : std::true_type {};
 
 /// @brief Credit card types
-///  If you want to use multiple card types, you can use bitwise(bitwise_or |) operators.
+///  If you want to use multiple card types, you can use the bitwise OR (`|`) operator.
 enum class CardTypes {
     AmericanExpress = 1 << 0,  // American Express
     JCB             = 1 << 1,  // JCB
@@ -73,7 +73,7 @@ template <>
 struct enable_bitwise_operators<CardTypes> : std::true_type {};
 
 /// @brief Barcode types
-///  If you want to use multiple barcode types, you can use bitwise(bitwise_or |) operators.
+///  If you want to use multiple barcode types, you can use the bitwise OR (`|`) operator.
 enum class BarcodeTypes {
     EAN8  = 1 << 0,  // EAN-8
     EAN13 = 1 << 1,  // EAN-13
@@ -91,7 +91,7 @@ enum class IpAddressType {
 };
 
 /// @brief Operating systems
-///  If you want to use multiple operating systems, you can use bitwise(bitwise_or |) operators.
+///  If you want to use multiple operating systems, you can use the bitwise OR (`|`) operator.
 enum class OperatingSystems {
     Windows = 1 << 0,  // Windows
     macOS   = 1 << 1,  // macOS

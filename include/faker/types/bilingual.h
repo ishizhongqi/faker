@@ -45,10 +45,10 @@ public:
     /// @brief Bilingual destructor.
     ~Bilingual() = default;
 
-    /// @brief Overload. Get the original as string.
+    /// @brief Overload. Gets the original as a string.
     explicit operator std::string() const;
 
-    /// @brief Overload. Get original as string_view.
+    /// @brief Overload. Gets the original as a string_view.
     explicit operator std::string_view() const;
 
     /// @brief Set the original.
@@ -57,24 +57,24 @@ public:
     /// @brief Set the translation.
     void set_translation(std::string_view translation);
 
-    /// @brief Get the original.
+    /// @brief Gets the original.
     /// @return The original.
     [[nodiscard]] std::string original() const;
 
-    /// @brief Get the original as a string view without copying.
+    /// @brief Gets the original as a string view without copying.
     [[nodiscard]] std::string_view original_view() const noexcept;
 
-    /// @brief Get the translation.
+    /// @brief Gets the translation.
     /// @return The translation of the original language
     [[nodiscard]] std::string translation() const;
 
-    /// @brief Get the translation as a string view without copying.
+    /// @brief Gets the translation as a string view without copying.
     [[nodiscard]] std::string_view translation_view() const noexcept;
 
     /// @brief Swap the original and translation.
     void swap();
 
-    /// @brief Check Bilingual if is empty.
+    /// @brief Checks whether the Bilingual object is empty.
     [[nodiscard]] bool empty() const noexcept;
 
 private:

@@ -16,7 +16,7 @@
 namespace faker::string {
 
 /// @brief Selects one item from a string of enumerated values.
-/// @param enums The list of string item.
+/// @param enums The list of string items.
 ///              If empty, return empty.
 /// @return An item of enums.
 /// @code

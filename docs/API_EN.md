@@ -1,6 +1,6 @@
 # faker API Quick Guide (English)
 
-This document lists all public APIs with a one-line description, key parameters, and short examples.
+This document lists all public APIs with short descriptions, key parameters, and concise examples.
 
 ## 1. Common Setup
 
@@ -8,13 +8,13 @@ This document lists all public APIs with a one-line description, key parameters,
 #include <faker/faker.h>
 ```
 
-Use bitwise `|` for enum flags (e.g. `Languages::English | Languages::Japanese`).
+Use bitwise `|` for enum flags (for example, `Languages::English | Languages::Japanese`).
 
 ## 2. Core Types
 
 ### 2.1 `faker::Bilingual`
 
-One object that stores `original` text and `translation` text.
+Stores two strings: `original` text and `translation` text.
 
 - Constructor: `Bilingual(std::string_view original, std::string_view translation)`
 - Constructor: `explicit Bilingual(const BilingualView&)`
@@ -22,14 +22,14 @@ One object that stores `original` text and `translation` text.
 
 ```cpp
 faker::Bilingual name("张伟", "Zhang Wei");
-std::string a = name.original();         // copy
-std::string_view b = name.original_view(); // view (no copy)
+std::string a = name.original();              // copy
+std::string_view b = name.original_view();    // view (no copy)
 ```
 
 ## 3. `faker::business`
 
 ### `company_name(languages)`
-Generate a localized company name.
+Generates a localized company name.
 
 - `languages`: `Languages` flags, default `Languages::English`
 
@@ -38,14 +38,14 @@ auto c = faker::business::company_name(faker::Languages::Japanese);
 ```
 
 ### `department(languages)`
-Generate a localized department string.
+Generates a localized department string.
 
 ```cpp
 auto d = faker::business::department();
 ```
 
 ### `industry(languages)`
-Generate a localized industry string.
+Generates a localized industry string.
 
 ```cpp
 auto i = faker::business::industry(faker::Languages::SimplifiedChinese);
@@ -66,7 +66,7 @@ auto name = company.name();
 ## 4. `faker::computer`
 
 ### `ip_address(type, unique)`
-Generate IPv4/IPv6 address.
+Generates an IPv4 or IPv6 address.
 
 - `type`: `IpAddressType::IPv4` or `IpAddressType::IPv6`
 - `unique`: unique-at-runtime sequence
@@ -76,14 +76,14 @@ auto ip = faker::computer::ip_address(faker::IpAddressType::IPv6, true);
 ```
 
 ### `mac_address(unique)`
-Generate MAC address.
+Generates a MAC address.
 
 ```cpp
 auto mac = faker::computer::mac_address();
 ```
 
 ### `file_path(operating_systems, extensions)`
-Generate file path for OS style.
+Generates a file path with the selected OS style.
 
 - `operating_systems`: `OperatingSystems` flags
 - `extensions`: optional extension list
@@ -96,31 +96,31 @@ auto p = faker::computer::file_path(
 ```
 
 ### `file_directory(operating_systems)`
-Generate directory path.
+Generates a directory path.
 
 ```cpp
 auto dir = faker::computer::file_directory(faker::OperatingSystems::Windows);
 ```
 
 ### `file_name(extensions)`
-Generate file name (with extension if provided).
+Generates a file name (with extension if provided).
 
 ```cpp
 auto n = faker::computer::file_name(std::to_array<std::string_view>({"jpg", "png"}));
 ```
 
 ### `file_extension(extensions)`
-Pick one extension (or empty when input empty).
+Picks one extension (or returns empty when input is empty).
 
 ```cpp
 auto ext = faker::computer::file_extension(std::to_array<std::string_view>({"cpp", "h"}));
 ```
 
 ### `url(subdomains, tlds, unique)`
-Generate URL.
+Generates a URL.
 
-- `subdomains`: optional list (empty => no subdomain)
-- `tlds`: optional list (nullopt => defaults)
+- `subdomains`: optional list (empty means no subdomain)
+- `tlds`: optional list (`nullopt` uses defaults)
 
 ```cpp
 auto u = faker::computer::url(
@@ -131,7 +131,7 @@ auto u = faker::computer::url(
 ```
 
 ### `hostname(subdomains, tlds, unique)`
-Generate hostname only (no scheme).
+Generates a hostname only (without scheme).
 
 ```cpp
 auto h = faker::computer::hostname();
@@ -154,21 +154,21 @@ auto path = f.path();
 ## 5. `faker::datetime`
 
 ### `date(start_date, end_date, days_of_week)`
-Generate date string in `YYYY-MM-DD`.
+Generates a date string in `YYYY-MM-DD`.
 
 ```cpp
 auto d = faker::datetime::date("2025-01-01", "2025-12-31", faker::DaysOfWeek::Monday);
 ```
 
 ### `time(start_time, end_time)`
-Generate time string in `HH:MM:SS`.
+Generates a time string in `HH:MM:SS`.
 
 ```cpp
 auto t = faker::datetime::time("09:00:00", "18:00:00");
 ```
 
 ### `datetime(start_date, end_date, start_time, end_time, days_of_week)`
-Generate datetime string in `YYYY-MM-DD HH:MM:SS`.
+Generates a datetime string in `YYYY-MM-DD HH:MM:SS`.
 
 ```cpp
 auto dt = faker::datetime::datetime();
@@ -177,7 +177,7 @@ auto dt = faker::datetime::datetime();
 ## 6. `faker::location`
 
 ### `address_line1(regions)` / `address_line2(regions)`
-Generate localized address lines.
+Generates localized address lines.
 
 ```cpp
 auto l1 = faker::location::address_line1(faker::Regions::Japan);
@@ -185,28 +185,28 @@ auto l2 = faker::location::address_line2(faker::Regions::Japan);
 ```
 
 ### `postcode(regions)`
-Generate postcode/zip.
+Generates a postcode/ZIP code.
 
 ```cpp
 auto code = faker::location::postcode();
 ```
 
 ### `full_address(regions)`
-Generate full localized address.
+Generates a full localized address.
 
 ```cpp
 auto addr = faker::location::full_address(faker::Regions::China);
 ```
 
 ### `city(regions)`
-Generate localized city.
+Generates a localized city name.
 
 ```cpp
 auto city = faker::location::city();
 ```
 
 ### `region(country_codes_standard, languages)`
-Generate region name or ISO code.
+Generates a region name or an ISO code.
 
 ```cpp
 auto r1 = faker::location::region(faker::CountryCodesStandard::None, faker::Languages::English);
@@ -227,28 +227,28 @@ auto full = loc.full_address();
 ## 7. `faker::number`
 
 ### `integer<T>(start, end)`
-Generate signed integer.
+Generates a signed integer.
 
 ```cpp
 auto v = faker::number::integer<int>(-100, 100);
 ```
 
 ### `unsigned_integer<T>(start, end)`
-Generate unsigned integer.
+Generates an unsigned integer.
 
 ```cpp
 auto u = faker::number::unsigned_integer<uint64_t>(1, 1000000);
 ```
 
 ### `decimal<T>(start, end, decimal_places)`
-Generate floating-point decimal.
+Generates a floating-point decimal value.
 
 ```cpp
 auto x = faker::number::decimal<double>(-1.0, 1.0, 4);
 ```
 
 ### `decimal_string<T>(start, end, decimal_places)`
-Generate decimal as string with fixed precision formatting.
+Generates a decimal string with fixed precision formatting.
 
 ```cpp
 auto s = faker::number::decimal_string<double>(0.0, 100.0, 6);
@@ -257,28 +257,28 @@ auto s = faker::number::decimal_string<double>(0.0, 100.0, 6);
 ## 8. `faker::payment`
 
 ### `payment_method(payment_methods)`
-Generate payment method.
+Generates a payment method.
 
 ```cpp
 auto m = faker::payment::payment_method(std::to_array<std::string_view>({"Credit Card", "PayPal"}));
 ```
 
 ### `card_type(languages, card_types)`
-Generate localized card type.
+Generates a localized card type.
 
 ```cpp
 auto t = faker::payment::card_type(faker::Languages::English, faker::CardTypes::Visa);
 ```
 
 ### `card_number(card_types, unique)`
-Generate card number.
+Generates a card number.
 
 ```cpp
 auto n = faker::payment::card_number(faker::CardTypes::MasterCard, true);
 ```
 
 ### `card_date(start_month, end_month)`
-Generate card date in `MM/YY`.
+Generates card expiry in `MM/YY`.
 
 ```cpp
 auto d = faker::payment::card_date("01/24", "12/30");
@@ -298,7 +298,7 @@ auto num = card.number();
 ## 9. `faker::person`
 
 ### `first_name(languages, genders)` / `last_name(languages)` / `full_name(languages, genders)`
-Generate localized name parts.
+Generates localized name fields.
 
 ```cpp
 auto fn = faker::person::first_name();
@@ -307,7 +307,7 @@ auto full = faker::person::full_name();
 ```
 
 ### `gender(languages)` / `title(languages, genders)` / `marital_status(languages)`
-Generate localized profile fields.
+Generates localized profile fields.
 
 ```cpp
 auto g = faker::person::gender();
@@ -316,28 +316,28 @@ auto ms = faker::person::marital_status();
 ```
 
 ### `phone_number(is_international, include_delimiters, regions, unique)`
-Generate phone number.
+Generates a phone number.
 
 ```cpp
 auto p = faker::person::phone_number(true, true, faker::Regions::UnitedStates, true);
 ```
 
 ### `email(languages, domains, unique)`
-Generate email.
+Generates an email address.
 
 ```cpp
 auto e = faker::person::email(faker::Languages::English, std::to_array<std::string_view>({"example.com"}), true);
 ```
 
 ### `job_title(languages)`
-Generate job title.
+Generates a job title.
 
 ```cpp
 auto j = faker::person::job_title();
 ```
 
 ### `social_network_id(languages, unique)`
-Generate social ID (`Bilingual`).
+Generates a social network ID (`Bilingual`).
 
 ```cpp
 auto sid = faker::person::social_network_id(faker::Languages::Japanese, false);
@@ -357,14 +357,14 @@ auto email = person.email();
 ## 10. `faker::product`
 
 ### `product_name(languages, keywords)`
-Generate product name.
+Generates a product name.
 
 ```cpp
 auto n = faker::product::product_name(faker::Languages::English, std::to_array<std::string_view>({"Phone", "Watch"}));
 ```
 
 ### `product_category(languages)` / `color(languages)` / `size()`
-Generate product category, color, and size.
+Generates a product category, color, and size.
 
 ```cpp
 auto c = faker::product::product_category();
@@ -373,7 +373,7 @@ auto size = faker::product::size();
 ```
 
 ### `barcode(barcode_types, unique)`
-Generate barcode string.
+Generates a barcode string.
 
 ```cpp
 auto b = faker::product::barcode(faker::BarcodeTypes::EAN13, true);
@@ -382,21 +382,21 @@ auto b = faker::product::barcode(faker::BarcodeTypes::EAN13, true);
 ## 11. `faker::string`
 
 ### `enum_item(enums)`
-Pick one item from input list.
+Picks one item from the input list.
 
 ```cpp
 auto item = faker::string::enum_item(std::to_array<std::string_view>({"A", "B", "C"}));
 ```
 
 ### `text(number_of_chars_start, number_of_chars_end)`
-Generate random text in a length range.
+Generates random text in a length range.
 
 ```cpp
 auto txt = faker::string::text(120, 240);
 ```
 
 ### `uuid(include_hyphens)`
-Generate UUID v4 string.
+Generates a UUID v4 string.
 
 ```cpp
 auto u1 = faker::string::uuid();

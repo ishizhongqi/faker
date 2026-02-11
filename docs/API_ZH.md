@@ -1,6 +1,6 @@
-# faker API 快速使用文档（中文）
+# faker API 快速参考（中文）
 
-本文档按模块列出公开 API，用“1 行说明 + 参数要点 + 简短示例”的方式说明使用方法。
+本文档按模块列出公开 API，采用“简要说明 + 参数要点 + 示例代码”的方式，便于快速查阅。
 
 ## 1. 基础引入
 
@@ -8,7 +8,7 @@
 #include <faker/faker.h>
 ```
 
-枚举位标志可用位或 `|` 组合，例如：`Languages::English | Languages::Japanese`。
+枚举位标志支持按位或 `|` 组合，例如：`Languages::English | Languages::Japanese`。
 
 ## 2. 核心类型
 
@@ -29,23 +29,23 @@ std::string_view b = name.original_view();  // 视图（不拷贝）
 ## 3. `faker::business`
 
 ### `company_name(languages)`
-生成本地化公司名。
+生成本地化公司名称。
 
-- `languages`：语言位标志，默认 `Languages::English`
+- `languages`：`Languages` 位标志，默认 `Languages::English`
 
 ```cpp
 auto c = faker::business::company_name(faker::Languages::Japanese);
 ```
 
 ### `department(languages)`
-生成本地化部门名。
+生成本地化部门名称。
 
 ```cpp
 auto d = faker::business::department();
 ```
 
 ### `industry(languages)`
-生成本地化行业名。
+生成本地化行业名称。
 
 ```cpp
 auto i = faker::business::industry(faker::Languages::SimplifiedChinese);
@@ -66,7 +66,7 @@ auto name = company.name();
 ## 4. `faker::computer`
 
 ### `ip_address(type, unique)`
-生成 IPv4/IPv6 地址。
+生成 IPv4 或 IPv6 地址。
 
 - `type`：`IpAddressType::IPv4` 或 `IpAddressType::IPv6`
 - `unique`：运行期唯一序列
@@ -83,7 +83,7 @@ auto mac = faker::computer::mac_address();
 ```
 
 ### `file_path(operating_systems, extensions)`
-按系统风格生成文件路径。
+按指定系统风格生成文件路径。
 
 - `operating_systems`：`OperatingSystems` 位标志
 - `extensions`：可选扩展名列表
@@ -103,14 +103,14 @@ auto dir = faker::computer::file_directory(faker::OperatingSystems::Windows);
 ```
 
 ### `file_name(extensions)`
-生成文件名（可带扩展名）。
+生成文件名（可附带扩展名）。
 
 ```cpp
 auto n = faker::computer::file_name(std::to_array<std::string_view>({"jpg", "png"}));
 ```
 
 ### `file_extension(extensions)`
-从输入扩展名中随机选一个（输入空则返回空）。
+从输入扩展名中随机选择一个（输入为空则返回空）。
 
 ```cpp
 auto ext = faker::computer::file_extension(std::to_array<std::string_view>({"cpp", "h"}));
@@ -119,8 +119,8 @@ auto ext = faker::computer::file_extension(std::to_array<std::string_view>({"cpp
 ### `url(subdomains, tlds, unique)`
 生成 URL。
 
-- `subdomains`：可选子域名列表（空=不带子域名）
-- `tlds`：可选顶级域名列表（`nullopt` 用默认）
+- `subdomains`：可选子域名列表（为空表示不带子域名）
+- `tlds`：可选顶级域名列表（`nullopt` 使用默认值）
 
 ```cpp
 auto u = faker::computer::url(
@@ -131,7 +131,7 @@ auto u = faker::computer::url(
 ```
 
 ### `hostname(subdomains, tlds, unique)`
-生成主机名（不带协议）。
+生成主机名（不包含协议）。
 
 ```cpp
 auto h = faker::computer::hostname();
@@ -154,21 +154,21 @@ auto path = f.path();
 ## 5. `faker::datetime`
 
 ### `date(start_date, end_date, days_of_week)`
-生成 `YYYY-MM-DD` 日期字符串。
+生成 `YYYY-MM-DD` 格式日期字符串。
 
 ```cpp
 auto d = faker::datetime::date("2025-01-01", "2025-12-31", faker::DaysOfWeek::Monday);
 ```
 
 ### `time(start_time, end_time)`
-生成 `HH:MM:SS` 时间字符串。
+生成 `HH:MM:SS` 格式时间字符串。
 
 ```cpp
 auto t = faker::datetime::time("09:00:00", "18:00:00");
 ```
 
 ### `datetime(start_date, end_date, start_time, end_time, days_of_week)`
-生成 `YYYY-MM-DD HH:MM:SS` 日期时间字符串。
+生成 `YYYY-MM-DD HH:MM:SS` 格式日期时间字符串。
 
 ```cpp
 auto dt = faker::datetime::datetime();
@@ -185,21 +185,21 @@ auto l2 = faker::location::address_line2(faker::Regions::Japan);
 ```
 
 ### `postcode(regions)`
-生成邮编。
+生成邮政编码。
 
 ```cpp
 auto code = faker::location::postcode();
 ```
 
 ### `full_address(regions)`
-生成完整地址。
+生成完整本地化地址。
 
 ```cpp
 auto addr = faker::location::full_address(faker::Regions::China);
 ```
 
 ### `city(regions)`
-生成城市名。
+生成本地化城市名称。
 
 ```cpp
 auto city = faker::location::city();
@@ -214,7 +214,7 @@ auto r2 = faker::location::region(faker::CountryCodesStandard::ISO_3166_1_alpha_
 ```
 
 ### `class Location`
-强关联实体地址对象。
+强关联地址实体。
 
 - 构造：`Location(Regions regions = Regions::UnitedStates)`
 - 方法：`reroll()`、`address_line1()`、`address_line2()`、`postcode()`、`full_address()`、`city()`、`region()`
@@ -241,14 +241,14 @@ auto u = faker::number::unsigned_integer<uint64_t>(1, 1000000);
 ```
 
 ### `decimal<T>(start, end, decimal_places)`
-生成浮点小数。
+生成浮点小数值。
 
 ```cpp
 auto x = faker::number::decimal<double>(-1.0, 1.0, 4);
 ```
 
 ### `decimal_string<T>(start, end, decimal_places)`
-生成固定小数位字符串。
+生成固定小数位格式的字符串。
 
 ```cpp
 auto s = faker::number::decimal_string<double>(0.0, 100.0, 6);
@@ -278,14 +278,14 @@ auto n = faker::payment::card_number(faker::CardTypes::MasterCard, true);
 ```
 
 ### `card_date(start_month, end_month)`
-生成 `MM/YY` 卡日期。
+生成 `MM/YY` 格式的卡片有效期。
 
 ```cpp
 auto d = faker::payment::card_date("01/24", "12/30");
 ```
 
 ### `class Card`
-强关联实体：卡类型、卡号、日期。
+强关联卡片实体。
 
 - 构造：`Card(languages, card_types, start_month, end_month, unique)`
 - 方法：`reroll()`、`type()`、`number()`、`date()`、`payment_method()`
@@ -307,7 +307,7 @@ auto full = faker::person::full_name();
 ```
 
 ### `gender(languages)` / `title(languages, genders)` / `marital_status(languages)`
-生成个人属性字段。
+生成本地化个人属性字段。
 
 ```cpp
 auto g = faker::person::gender();
@@ -323,28 +323,28 @@ auto p = faker::person::phone_number(true, true, faker::Regions::UnitedStates, t
 ```
 
 ### `email(languages, domains, unique)`
-生成邮箱。
+生成电子邮箱地址。
 
 ```cpp
 auto e = faker::person::email(faker::Languages::English, std::to_array<std::string_view>({"example.com"}), true);
 ```
 
 ### `job_title(languages)`
-生成职位。
+生成职位名称。
 
 ```cpp
 auto j = faker::person::job_title();
 ```
 
 ### `social_network_id(languages, unique)`
-生成社交 ID（`Bilingual`）。
+生成社交网络 ID（`Bilingual`）。
 
 ```cpp
 auto sid = faker::person::social_network_id(faker::Languages::Japanese, false);
 ```
 
 ### `class Person`
-强关联实体人物对象。
+强关联人物实体。
 
 - 构造：`Person(genders, languages, regions, email_domains, unique)`
 - 方法：`reroll()`、`full_name()`、`first_name()`、`last_name()`、`gender()`、`title()`、`marital_status()`、`phone_number()`、`email()`、`job_title()`、`social_network_id()`
@@ -357,14 +357,14 @@ auto email = person.email();
 ## 10. `faker::product`
 
 ### `product_name(languages, keywords)`
-生成商品名。
+生成商品名称。
 
 ```cpp
 auto n = faker::product::product_name(faker::Languages::English, std::to_array<std::string_view>({"Phone", "Watch"}));
 ```
 
 ### `product_category(languages)` / `color(languages)` / `size()`
-生成商品分类、颜色、尺码。
+生成商品类别、颜色和尺码。
 
 ```cpp
 auto c = faker::product::product_category();
@@ -382,14 +382,14 @@ auto b = faker::product::barcode(faker::BarcodeTypes::EAN13, true);
 ## 11. `faker::string`
 
 ### `enum_item(enums)`
-从输入列表随机选一个字符串。
+从输入列表中随机选择一个字符串。
 
 ```cpp
 auto item = faker::string::enum_item(std::to_array<std::string_view>({"A", "B", "C"}));
 ```
 
 ### `text(number_of_chars_start, number_of_chars_end)`
-按长度范围生成随机文本。
+按长度区间生成随机文本。
 
 ```cpp
 auto txt = faker::string::text(120, 240);

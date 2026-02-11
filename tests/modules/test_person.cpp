@@ -313,7 +313,7 @@ TEST(PersonTest, ShouldGenerateUniquePerson) {
     ASSERT_FALSE(generated_person.social_network_id().translation().empty());
 }
 
-TEST(PersonTest, ShouldThrowExceptionrWhenEmailDomainsIsEmpty) {
+TEST(PersonTest, ShouldThrowExceptionWhenEmailDomainsIsEmpty) {
     std::vector<std::string_view> empty_email_domains = {};
     ASSERT_THROW(email(Languages::English, empty_email_domains), std::invalid_argument);
 }
@@ -322,7 +322,7 @@ TEST(PersonTest, ShouldThrowExceptionWhenEmailDomainsContainEmptyItem) {
     ASSERT_THROW(email(Languages::English, std::to_array<std::string_view>({"gmail.com", ""})), std::invalid_argument);
 }
 
-TEST(PersonTest, ShouldThrowExceptionrWhenPersonEmailDomainsIsEmpty) {
+TEST(PersonTest, ShouldThrowExceptionWhenPersonEmailDomainsIsEmpty) {
     std::vector<std::string_view> empty_email_domains = {};
     ASSERT_THROW(
         Person generated_person(Genders::M, Languages::English, Regions::UnitedStates, empty_email_domains),

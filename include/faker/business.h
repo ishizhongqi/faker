@@ -17,7 +17,7 @@ namespace faker::business {
 
 /// @brief Generates a random company name.
 /// @param languages The languages of the company name. Defaults to Languages::English.
-///                  If multiple languages are specified, bitwise(bitwise_or |) operator can be used.
+///                  If multiple languages are specified, the bitwise OR (`|`) operator can be used.
 /// @return A company name.
 /// @note You need to use class @code faker::Bilingual@endcode to get company name.
 /// @code
@@ -30,7 +30,7 @@ FAKER_EXPORT Bilingual company_name(Languages languages = Languages::English);
 
 /// @brief Generates a random department.
 /// @param languages The languages of the department. Defaults to Languages::English.
-///                  If multiple languages are specified, bitwise(bitwise_or |) operator can be used.
+///                  If multiple languages are specified, the bitwise OR (`|`) operator can be used.
 /// @return A department.
 /// @code
 /// faker::business::department();  // "Public Relations"
@@ -42,7 +42,7 @@ FAKER_EXPORT std::string department(Languages languages = Languages::English);
 
 /// @brief Generates a random industry.
 /// @param languages The languages of the industry. Defaults to Languages::English.
-///                  If multiple languages are specified, bitwise(bitwise_or |) operator can be used.
+///                  If multiple languages are specified, the bitwise OR (`|`) operator can be used.
 /// @return An industry.
 /// @code
 /// faker::business::industry();  // "Consulting industry"
@@ -66,7 +66,7 @@ class FAKER_EXPORT Company {
 public:
     /// @brief Constructs a company entity.
     /// @param languages The languages of the industry. Defaults to Languages::English.
-    ///                  If multiple languages are specified, bitwise(bitwise_or |) operator can be used.
+    ///                  If multiple languages are specified, the bitwise OR (`|`) operator can be used.
     explicit Company(Languages languages = Languages::English);
 
     /// @brief Destroys the company entity.

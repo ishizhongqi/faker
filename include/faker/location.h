@@ -15,7 +15,7 @@ namespace faker::location {
 
 /// @brief Generates random address line 1.
 /// @param regions Regions. Defaults to Regions::UnitedStates.
-///                If multiple regions are specified, bitwise(bitwise_or |) operator can be used.
+///                If multiple regions are specified, the bitwise OR (`|`) operator can be used.
 /// @return Address line 1.
 /// @note You need to use class @code faker::Bilingual@endcode to get address line 1.
 /// @code
@@ -26,7 +26,7 @@ FAKER_EXPORT Bilingual address_line1(Regions regions = Regions::UnitedStates);
 
 /// @brief Generates random address line 2.
 /// @param regions Regions. Defaults to Regions::UnitedStates.
-///                If multiple regions are specified, bitwise(bitwise_or |) operator can be used.
+///                If multiple regions are specified, the bitwise OR (`|`) operator can be used.
 /// @return Address line 2, it might be empty.
 /// @note You need to use class @code faker::Bilingual@endcode to get address line 2.
 /// @code
@@ -37,7 +37,7 @@ FAKER_EXPORT Bilingual address_line2(Regions regions = Regions::UnitedStates);
 
 /// @brief Generates a random postal code or zip code or postcode.
 /// @param regions Regions. Defaults to Regions::UnitedStates.
-///                If multiple regions are specified, bitwise(bitwise_or |) operator can be used.
+///                If multiple regions are specified, the bitwise OR (`|`) operator can be used.
 /// @return A postal code or zip code or postcode.
 /// @code
 /// faker::location::postcode();  // "42101-3057"
@@ -47,7 +47,7 @@ FAKER_EXPORT std::string postcode(Regions regions = Regions::UnitedStates);
 
 /// @brief Generates random full address.
 /// @param regions Regions. Defaults to Regions::UnitedStates.
-///                If multiple regions are specified, bitwise(bitwise_or |) operator can be used.
+///                If multiple regions are specified, the bitwise OR (`|`) operator can be used.
 /// @return Full address.
 /// @note You need to use class @code faker::Bilingual@endcode to get full address.
 ///       If International format address is needed, @code Translate()@endcode can be used.
@@ -61,7 +61,7 @@ FAKER_EXPORT Bilingual full_address(Regions regions = Regions::UnitedStates);
 
 /// @brief Generates a random city.
 /// @param regions Regions. Defaults to Regions::UnitedStates.
-///                If multiple regions are specified, bitwise(bitwise_or |) operator can be used.
+///                If multiple regions are specified, the bitwise OR (`|`) operator can be used.
 /// @return A city.
 /// @note You need to use class @code faker::Bilingual@endcode to get city.
 /// @code
@@ -73,7 +73,7 @@ FAKER_EXPORT Bilingual city(Regions regions = Regions::UnitedStates);
 /// @brief Generates a random region.
 /// @param country_codes_standard Country codes standard. Defaults to CountryCodesStandard::None.
 /// @param languages The languages of the region. Defaults to Languages::English.
-///                  If multiple languages are specified, bitwise(bitwise_or |) operator can be used.
+///                  If multiple languages are specified, the bitwise OR (`|`) operator can be used.
 /// @return A region.
 /// @code
 /// faker::location::region();  // "United States"
@@ -125,7 +125,7 @@ public:
     /// @note You need to use class @code faker::Bilingual@endcode to get address line 2.
     [[nodiscard]] Bilingual address_line2() const;
 
-    /// @brief Get the postal code.
+    /// @brief Gets the postal code.
     /// @return Postal code.
     [[nodiscard]] std::string postcode() const;
 
@@ -134,12 +134,12 @@ public:
     /// @note You need to use class @code faker::Bilingual@endcode to get full address.
     [[nodiscard]] Bilingual full_address() const;
 
-    /// @brief Get the city.
+    /// @brief Gets the city.
     /// @return City.
     /// @note You need to use class @code faker::Bilingual@endcode to get city.
     [[nodiscard]] Bilingual city() const;
 
-    /// @brief Get the region.
+    /// @brief Gets the region.
     /// @param country_codes_standard Country codes standard. Defaults to CountryCodesStandard::None.
     /// @param languages The languages of the region. Defaults to Languages::English.
     /// @return Region.

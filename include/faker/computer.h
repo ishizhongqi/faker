@@ -40,7 +40,7 @@ FAKER_EXPORT std::string mac_address(bool unique = false);
 
 /// @brief Generates a random file path.
 /// @param operating_systems Operating systems. Defaults to OperatingSystem::Windows.
-///                          If multiple operating systems are specified, bitwise(bitwise_or |) operator can be used.
+///                          If multiple operating systems are specified, the bitwise OR (`|`) operator can be used.
 /// @param extensions The list of file extensions.
 ///                   Defaults to {}.
 ///                   If empty, the generated file path will not include extension.
@@ -59,7 +59,7 @@ FAKER_EXPORT std::string file_path(
 
 /// @brief Generates a random file directory.
 /// @param operating_systems Operating systems. Defaults to OperatingSystem::Windows.
-///                          If multiple operating systems are specified, bitwise(bitwise_or |) operator can be used.
+///                          If multiple operating systems are specified, the bitwise OR (`|`) operator can be used.
 /// @return A file directory.
 /// @code
 /// faker::computer::file_directory();  // "C:\Users\Administrator\docs"
@@ -92,15 +92,15 @@ FAKER_EXPORT std::string file_name(std::span<const std::string_view> extensions 
 /// @endcode
 FAKER_EXPORT std::string file_extension(std::span<const std::string_view> extensions = {});
 
-/// @brief Generates a random url.
+/// @brief Generates a random URL.
 /// @param subdomains The list of subdomains.
 ///                   Defaults to {}.
-///                   If empty, the generated url will not include subdomain.
-/// @param tlds The list of tlds(top-level-domains).
+///                   If empty, the generated URL will not include subdomain.
+/// @param tlds The list of TLDs (top-level domains).
 ///             Defaults to std::nullopt, equivalent to {"com", "net", "org"}.
-///             If empty, throw error.
-/// @param unique Whether to generate a unique url. Defaults to false.
-/// @return A url.
+///             If empty, throws an error.
+/// @param unique Whether to generate a unique URL. Defaults to false.
+/// @return A URL.
 /// @code
 /// faker::computer::url();  // "https://image.koizumi.com"
 /// faker::computer::url(std::to_array<std::string_view>({"note"}), std::to_array<std::string_view>({"com"}));
@@ -117,9 +117,9 @@ FAKER_EXPORT std::string url(
 /// @param subdomains The list of subdomains.
 ///                   Defaults to {}.
 ///                   If empty, the generated hostname will not include subdomain.
-/// @param tlds The list of tlds(top-level-domains).
+/// @param tlds The list of TLDs (top-level domains).
 ///             Defaults to std::nullopt, equivalent to {"com", "net", "org"}.
-///             If empty, throw error.
+///             If empty, throws an error.
 /// @param unique Whether to generate a unique hostname. Defaults to false.
 /// @return A hostname.
 /// @code
@@ -152,8 +152,7 @@ class FAKER_EXPORT File {
 public:
     /// @brief Constructs a file entity.
     /// @param operating_systems Operating system. Defaults to OperatingSystem::Windows.
-    ///                          If multiple operating systems are specified, bitwise(bitwise_or |) operator can be
-    ///                          used.
+    ///                          If multiple operating systems are specified, the bitwise OR (`|`) operator can be used.
     /// @param extensions The list of file extensions.
     ///                   Defaults to {}.
     ///                   If empty, the generated file path will not include extension.

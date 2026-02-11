@@ -2,33 +2,28 @@
 
 ## 简介
 
-**faker** 是一个用于生成虚假数据的 C++ 库。
+**faker** 是一个用于生成高质量虚拟数据的 C++ 库。
 
-在数据库测试中，经常会遇到需要生成测试数据的情况，这正是这个想法的来源。我注意到
-**_Navicat 的数据生成（Data Generation）_** 已经提供了类似的功能，但这是一个付费功能。
+这个项目来自数据库开发与测试中的一个高频需求：快速构造大量可用的样本数据。虽然 **_Navicat 的 Data Generation_** 等工具已经提供了类似能力，但它们属于付费功能。
 
-我的计划是开发一个类似 **_Navicat 的数据生成（Data Generation）_** 的简单应用
-（当然，它不会像 Navicat 的专业工具那样功能丰富）。
-**faker** 库是该项目的一部分，因此 faker 的各个模块在设计上与 **_Navicat 的数据生成（Data Generation）_** 相似。
+本项目的目标是提供一个轻量、免费、易集成的替代方案。`faker` 库是整个项目的核心组件，模块划分也围绕常见的数据生成场景展开。
 
-本项目还参考了一些其他流行的开源项目，例如
-[joke2k/faker](https://github.com/joke2k/faker) 以及
-[cieslarmichal/faker-cxx](https://github.com/cieslarmichal/faker-cxx) 。
+项目实现还参考了多个成熟开源项目，包括 [joke2k/faker](https://github.com/joke2k/faker) 和 [cieslarmichal/faker-cxx](https://github.com/cieslarmichal/faker-cxx)。
 
 ## 使用方法
 
 ### 编译器支持
 
-| Compiler                                                          | Minimum Version | Notes                               |
-|-------------------------------------------------------------------|-----------------|-------------------------------------|
+| Compiler                                                          | Minimum Version | Notes                                |
+|-------------------------------------------------------------------|-----------------|--------------------------------------|
 | [GCC](https://gcc.gnu.org/)                                       | 13              | Tested on Ubuntu (aarch64 / x86_64) |
-| [Clang](https://clang.llvm.org/)                                  | 16              | LLVM Clang                          |
-| [Apple Clang](https://clang.llvm.org/)                            | Xcode 15+       | macOS                               |
-| [MSVC](https://visualstudio.microsoft.com/vs/features/cplusplus/) | 19.34           | Visual Studio 2022 (v143)           |
+| [Clang](https://clang.llvm.org/)                                  | 16              | LLVM Clang                           |
+| [Apple Clang](https://clang.llvm.org/)                            | Xcode 15+       | macOS                                |
+| [MSVC](https://visualstudio.microsoft.com/vs/features/cplusplus/) | 19.34           | Visual Studio 2022 (v143)            |
 
-### 添加库
+### 引入库
 
-#### 方法一： Git Submodule
+#### 方式一：Git Submodule
 
 ```shell
 mkdir third_party
@@ -37,7 +32,7 @@ git submodule add https://github.com/ishizhongqi/faker.git
 git submodule update --init --recursive
 ```
 
-然后在你的`CMakeLists.txt` 中加入以下内容:
+然后在你的 `CMakeLists.txt` 中加入：
 
 ```cmake
 add_subdirectory(third_party/faker)
@@ -46,7 +41,7 @@ add_executable(your_target main.cpp)
 target_link_libraries(your_target PRIVATE faker)
 ```
 
-#### 方法二: FetchContent
+#### 方式二：FetchContent
 
 ```cmake
 include(FetchContent)
@@ -63,49 +58,45 @@ add_executable(your_target main.cpp)
 target_link_libraries(your_target PRIVATE faker)
 ```
 
-### 开始你的项目
+### 快速开始
 
-[源代码](example/main.cpp)：
+[示例代码](./example/main.cpp)：
 
 ```c++
-// You can include the full header <faker/faker.h>, or include individual module headers like <faker/number.h>.
+// Include the umbrella header <faker/faker.h>, or include individual module headers such as <faker/number.h>.
 #include <faker/faker.h>
 
 #include <iostream>
 #include <string>
 
 int main() {
-    // You need to use a Bilingual object to store the return values from functions that provide bilingual output.
+    // Use a Bilingual object to store results from APIs that return bilingual output.
     const faker::Bilingual first_name_bilingual   = faker::person::first_name(faker::Languages::SimplifiedChinese);
     const std::string      first_name_original    = first_name_bilingual.original();
     const std::string      first_name_translation = first_name_bilingual.translation();
     std::cout << "First name: " << first_name_original << " (" << first_name_translation << ")" << std::endl;
 
-    // Most function parameters have default values, so you can just call the functions without providing any arguments.
+    // Most function parameters have default values, so you can call these APIs without passing arguments.
     const std::string industry = faker::business::industry();
     std::cout << "Industry: " << industry << std::endl;
 
-    // Some functions allow bitwise OR (|) in their parameters,
-    // which you can use when you want to generate multiple enum members at once.
+    // Some functions accept bitwise OR (|) for enum flags, allowing multiple selections in one call.
     const std::string date =
         faker::datetime::date("2023-01-01", "2023-12-31", faker::DaysOfWeek::Monday | faker::DaysOfWeek::Thursday);
     std::cout << "Date: " << date << std::endl;
 
-    // You can use a class to create an entity
-    // where the generated data has stronger correlations between its fields.
-    // Of course, you can choose to call it with or without parameters.
+    // Entity classes generate field values with stronger internal consistency.
+    // You can construct them with or without arguments.
     const faker::person::Person person;
-    // At this point, the fake data has been fully generated, and you just need to call the getters to get data.
+    // The fake data is ready after construction; call getters to access each field.
     std::cout << "Person::First name : " << person.first_name().original() << std::endl;
     std::cout << "Person::Full name  : " << person.full_name().original() << std::endl;
     std::cout << "Person::Gender     : " << person.gender() << std::endl;
     std::cout << "Person::Email      : " << person.email() << std::endl;
 
-    // For the other functions and classes, see the source code comments or the documentation.
-    
+    // For additional APIs, see the source comments and documentation.
     return 0;
 }
-
 ```
 
 输出示例：
@@ -122,28 +113,33 @@ Person::Email      : KimberlyMullen.live@hotmail.com
 
 ## 模块
 
-| 模块       | 接口                                                                                                                                 |
-|:---------|:-----------------------------------------------------------------------------------------------------------------------------------|
-| business | company_name, department, industry, **Company**                                                                                    |
-| computer | ip_address*, mac_address*, file_path, file_directory, file_name, file_extension, url*, hostname*, **File***                        |
-| datetime | date, time, datetime                                                                                                               |
-| location | address_line1, address_line2, postcode, full_address, city, region, **Location**                                                   |
-| number   | integer, unsigned_integer, decimal, decimal_string                                                                                 |
-| payment  | payment_method, card_type, card_number*, card_date, **Card***                                                                      |
-| person   | first_name, last_name, full_name, gender, title, marital_status, phone_number*, email*, job_title, social_network_id*, **Person*** |
-| product  | product_name, product_category, color, size, barcode*                                                                              |
-| string   | enum_item, text, uuid                                                                                                              |
+| 模块      | 接口                                                                                                                                 |
+|:----------|:-------------------------------------------------------------------------------------------------------------------------------------|
+| business  | company_name, department, industry, **Company**                                                                                      |
+| computer  | ip_address*, mac_address*, file_path, file_directory, file_name, file_extension, url*, hostname*, **File***                        |
+| datetime  | date, time, datetime                                                                                                                 |
+| location  | address_line1, address_line2, postcode, full_address, city, region, **Location**                                                    |
+| number    | integer, unsigned_integer, decimal, decimal_string                                                                                   |
+| payment   | payment_method, card_type, card_number*, card_date, **Card***                                                                        |
+| person    | first_name, last_name, full_name, gender, title, marital_status, phone_number*, email*, job_title, social_network_id*, **Person*** |
+| product   | product_name, product_category, color, size, barcode*                                                                                |
+| string    | enum_item, text, uuid                                                                                                                |
 
-function* : 表示该函数包含unique参数，当参数为true时，用于在程序运行时生成唯一的随机值。  
-**粗体** : 表示这是实体类，他的字段之间有更强的相关性。
+`function*`：表示该函数支持 `unique` 参数。设为 `true` 时，运行期会生成唯一随机值。  
+`**粗体**`：表示实体类，其字段之间具有更强的关联性。
 
-部分数据支持本地化，目前支持的语言包括：
+部分数据支持本地化。目前支持以下语言：
 
 - 英语
 - 简体中文
 - 繁体中文
 - 日语
 
+## API 文档
+
+- English: [docs/API_EN.md](./docs/API_EN.md)
+- 中文: [docs/API_ZH.md](./docs/API_ZH.md)
+
 ## 许可证
 
-本项目基于 [MIT License](LICENSE) 。
+本项目基于 [MIT License](./LICENSE)。

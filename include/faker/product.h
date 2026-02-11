@@ -19,11 +19,11 @@ namespace faker::product {
 
 /// @brief Generates a random product name.
 /// @param languages The languages of prefixes or suffixes. Defaults to Languages::English.
-///                  If multiple languages are specified, bitwise(bitwise_or |) operator can be used.
+///                  If multiple languages are specified, the bitwise OR (`|`) operator can be used.
 /// @param keywords The list of product keywords.
 ///                 Defaults to std::nullopt,
 ///                 equivalent to {"Cherry", "Orange", "Pluots", "Grape", "Kiwi", "Mango", "Raspberry", "Strawberry"}.
-///                 If empty, throw error.
+///                 If empty, throws an error.
 /// @return A product name.
 /// @code
 /// faker::product::product_name();  // "Mango Ultra"
@@ -39,7 +39,7 @@ FAKER_EXPORT std::string product_name(
 
 /// @brief Generates a random product category.
 /// @param languages The languages of product category. Defaults to Languages::English.
-///                  If multiple languages are specified, bitwise(bitwise_or |) operator can be used.
+///                  If multiple languages are specified, the bitwise OR (`|`) operator can be used.
 /// @return A product category.
 /// @code
 /// faker::product::product_category();  // "Health & Baby Care"
@@ -51,7 +51,7 @@ FAKER_EXPORT std::string product_category(Languages languages = Languages::Engli
 
 /// @brief Generates a random color string.
 /// @param languages The languages of product category. Defaults to Languages::English.
-///                  If multiple languages are specified, bitwise(bitwise_or |) operator can be used.
+///                  If multiple languages are specified, the bitwise OR (`|`) operator can be used.
 /// @return A color string.
 /// @code
 /// faker::product::color();  // "Sepia"

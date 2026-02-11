@@ -8,34 +8,28 @@
 
 ## Introduction
 
-**faker** is a C++ library that generates fake data for you.
+**faker** is a C++ library for generating realistic fake data.
 
-In database testing, it’s common to run into situations where you need to generate test data that’s where this idea came
-from. I noticed that **_Navicat’s Data Generation_** already provides this functionality, but it’s a paid feature.
+The project originates from a practical need in database development and testing: producing large amounts of high-quality sample data quickly. While tools such as **_Navicat’s Data Generation_** provide similar capabilities, they are paid products.
 
-My plan is to develop a simple and free application like **_Navicat’s Data Generation_**
-(of course, it won’t be as feature-rich as Navicat’s professional tool).
-The **faker** library is part of this project, So the faker's modules are quite similar to **_Navicat’s Data Generation_
-**.
+This project aims to provide a lightweight and free alternative for common fake-data workflows. The `faker` library is the core component, and its modules are organized around familiar data-generation categories.
 
-This project also references some other popular open-source projects, such as
-[joke2k/faker](https://github.com/joke2k/faker)  and
-[cieslarmichal/faker-cxx](https://github.com/cieslarmichal/faker-cxx) .
+The design is also inspired by established open-source projects, including [joke2k/faker](https://github.com/joke2k/faker) and [cieslarmichal/faker-cxx](https://github.com/cieslarmichal/faker-cxx).
 
 ## Usage
 
 ### Compiler support
 
-| Compiler                                                          | Minimum Version | Notes                               |
-|-------------------------------------------------------------------|-----------------|-------------------------------------|
+| Compiler                                                          | Minimum Version | Notes                                |
+|-------------------------------------------------------------------|-----------------|--------------------------------------|
 | [GCC](https://gcc.gnu.org/)                                       | 13              | Tested on Ubuntu (aarch64 / x86_64) |
-| [Clang](https://clang.llvm.org/)                                  | 16              | LLVM Clang                          |
-| [Apple Clang](https://clang.llvm.org/)                            | Xcode 15+       | macOS                               |
-| [MSVC](https://visualstudio.microsoft.com/vs/features/cplusplus/) | 19.34           | Visual Studio 2022 (v143)           |
+| [Clang](https://clang.llvm.org/)                                  | 16              | LLVM Clang                           |
+| [Apple Clang](https://clang.llvm.org/)                            | Xcode 15+       | macOS                                |
+| [MSVC](https://visualstudio.microsoft.com/vs/features/cplusplus/) | 19.34           | Visual Studio 2022 (v143)            |
 
 ### Add library
 
-#### Option 1 : Git Submodule
+#### Option 1: Git Submodule
 
 ```shell
 mkdir third_party
@@ -44,7 +38,7 @@ git submodule add https://github.com/ishizhongqi/faker.git
 git submodule update --init --recursive
 ```
 
-Then in your `CMakeLists.txt`：
+Then, in your `CMakeLists.txt`:
 
 ```cmake
 add_subdirectory(third_party/faker)
@@ -53,7 +47,7 @@ add_executable(your_target main.cpp)
 target_link_libraries(your_target PRIVATE faker)
 ```
 
-#### Option 2 : FetchContent
+#### Option 2: FetchContent
 
 ```cmake
 include(FetchContent)
@@ -72,47 +66,43 @@ target_link_libraries(your_target PRIVATE faker)
 
 ### Start your project
 
-[Source code](./example/main.cpp) :
+[Source code](./example/main.cpp):
 
 ```c++
-// You can include the full header <faker/faker.h>, or include individual module headers like <faker/number.h>.
+// Include the umbrella header <faker/faker.h>, or include individual module headers such as <faker/number.h>.
 #include <faker/faker.h>
 
 #include <iostream>
 #include <string>
 
 int main() {
-    // You need to use a Bilingual object to store the return values from functions that provide bilingual output.
+    // Use a Bilingual object to store results from APIs that return bilingual output.
     const faker::Bilingual first_name_bilingual   = faker::person::first_name(faker::Languages::SimplifiedChinese);
     const std::string      first_name_original    = first_name_bilingual.original();
     const std::string      first_name_translation = first_name_bilingual.translation();
     std::cout << "First name: " << first_name_original << " (" << first_name_translation << ")" << std::endl;
 
-    // Most function parameters have default values, so you can just call the functions without providing any arguments.
+    // Most function parameters have default values, so you can call these APIs without passing arguments.
     const std::string industry = faker::business::industry();
     std::cout << "Industry: " << industry << std::endl;
 
-    // Some functions allow bitwise OR (|) in their parameters,
-    // which you can use when you want to generate multiple enum members at once.
+    // Some functions accept bitwise OR (|) for enum flags, allowing multiple selections in one call.
     const std::string date =
         faker::datetime::date("2023-01-01", "2023-12-31", faker::DaysOfWeek::Monday | faker::DaysOfWeek::Thursday);
     std::cout << "Date: " << date << std::endl;
 
-    // You can use a class to create an entity
-    // where the generated data has stronger correlations between its fields.
-    // Of course, you can choose to call it with or without parameters.
+    // Entity classes generate field values with stronger internal consistency.
+    // You can construct them with or without arguments.
     const faker::person::Person person;
-    // At this point, the fake data has been fully generated, and you just need to call the getters to get data.
+    // The fake data is ready after construction; call getters to access each field.
     std::cout << "Person::First name : " << person.first_name().original() << std::endl;
     std::cout << "Person::Full name  : " << person.full_name().original() << std::endl;
     std::cout << "Person::Gender     : " << person.gender() << std::endl;
     std::cout << "Person::Email      : " << person.email() << std::endl;
 
-    // For the other functions and classes, see the source code comments or the documentation.
-    
+    // For additional APIs, see the source comments and documentation.
     return 0;
 }
-
 ```
 
 Output example:
@@ -129,28 +119,32 @@ Person::Email      : KimberlyMullen.live@hotmail.com
 
 ## Modules
 
-| Module   | Functions                                                                                                                          |
-|:---------|:-----------------------------------------------------------------------------------------------------------------------------------|
-| business | company_name, department, industry, **Company**                                                                                    |
+| Module   | Functions                                                                                                                            |
+|:---------|:-------------------------------------------------------------------------------------------------------------------------------------|
+| business | company_name, department, industry, **Company**                                                                                      |
 | computer | ip_address*, mac_address*, file_path, file_directory, file_name, file_extension, url*, hostname*, **File***                        |
-| datetime | date, time, datetime                                                                                                               |
-| location | address_line1, address_line2, postcode, full_address, city, region, **Location**                                                   |
-| number   | integer, unsigned_integer, decimal, decimal_string                                                                                 |
-| payment  | payment_method, card_type, card_number*, card_date, **Card***                                                                      |
+| datetime | date, time, datetime                                                                                                                 |
+| location | address_line1, address_line2, postcode, full_address, city, region, **Location**                                                    |
+| number   | integer, unsigned_integer, decimal, decimal_string                                                                                   |
+| payment  | payment_method, card_type, card_number*, card_date, **Card***                                                                        |
 | person   | first_name, last_name, full_name, gender, title, marital_status, phone_number*, email*, job_title, social_network_id*, **Person*** |
-| product  | product_name, product_category, color, size, barcode*                                                                              |
-| string   | enum_item, text, uuid                                                                                                              |
+| product  | product_name, product_category, color, size, barcode*                                                                                |
+| string   | enum_item, text, uuid                                                                                                                |
 
-function* : Indicates that this function includes a unique parameter. When set to true, it enables the generation of
-unique random values during program runtime.  
-**Bold** : Indicates that this is an entity class, whose fields exhibit stronger interdependencies correlations.
+`function*`: Indicates that the function provides a `unique` parameter. When set to `true`, it generates unique random values during runtime.  
+`**Bold**`: Indicates an entity class whose fields have stronger interdependencies.
 
-Some data supports localization, currently supported languages are:
+Some data supports localization. Currently supported languages:
 
 - English
 - Simplified Chinese
 - Traditional Chinese
 - Japanese
+
+## API Docs
+
+- English: [docs/API_EN.md](./docs/API_EN.md)
+- 中文: [docs/API_ZH.md](./docs/API_ZH.md)
 
 ## License
 
