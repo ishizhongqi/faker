@@ -20,7 +20,7 @@ namespace faker::string {
 ///              If empty, return empty.
 /// @return An item of enums.
 /// @code
-/// faker::string::enum_item({"First", "Second", "Third"});  // "First"
+/// faker::string::enum_item(std::to_array<std::string_view>({"First", "Second", "Third"}));  // "First"
 /// @endcode
 FAKER_EXPORT std::string enum_item(std::span<const std::string_view> enums);
 

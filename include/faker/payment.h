@@ -71,14 +71,17 @@ FAKER_EXPORT std::string card_number(
 );
 
 /// @brief Generates a random issue or valid through date of a card.
-/// @param start The start month in the format of "mm/YY". Defaults to "01/00".
-/// @param end The end month in the format of "mm/YY". Defaults to "12/50".
+/// @param start_month The start month in the format of "mm/YY". Defaults to "01/00".
+/// @param end_month The end month in the format of "mm/YY". Defaults to "12/50".
 /// @return A card date in the format of "mm/YY".
 /// @code
 /// faker::payment::card_date();  // "07/25"
 /// faker::payment::card_date("03/11", "04/12");  // "03/12"
 /// @endcode
-FAKER_EXPORT std::string card_date(std::string_view start = "01/00", std::string_view end = "12/50");
+FAKER_EXPORT std::string card_date(
+    std::string_view start_month = "01/00",
+    std::string_view end_month   = "12/50"
+);
 
 /// @brief Represents a card entity with a generated type, number and date
 ///        that are strongly correlated and contextually appropriate.
@@ -102,8 +105,8 @@ public:
     ///                   Defaults to CardTypes::AmericanExpress, CardTypes::JCB,
     ///                   CardTypes::MasterCard, CardTypes::UnionPay and CardTypes::Visa.
     ///                   If multiple card types are specified, bitwise(bitwise_or |) operator can be used.
-    /// @param start The start month in the format of "mm/YY". Defaults to "01/00".
-    /// @param end The end month in the format of "mm/YY". Defaults to "12/50".
+    /// @param start_month The start month in the format of "mm/YY". Defaults to "01/00".
+    /// @param end_month The end month in the format of "mm/YY". Defaults to "12/50".
     /// @param unique Whether to generate a unique card number.
     ///               Supported data: card_number.
     ///               Defaults to false.
@@ -112,8 +115,8 @@ public:
         Languages languages = Languages::English,
         CardTypes card_types =
             CardTypes::AmericanExpress | CardTypes::JCB | CardTypes::MasterCard | CardTypes::UnionPay | CardTypes::Visa,
-        std::string_view start  = "01/00",
-        std::string_view end    = "12/50",
+        std::string_view start_month = "01/00",
+        std::string_view end_month   = "12/50",
         bool             unique = false
     );
 
@@ -143,8 +146,8 @@ private:
     // Constructor parameters
     Languages   languages_;
     CardTypes   card_types_;
-    std::string start_;
-    std::string end_;
+    std::string start_month_;
+    std::string end_month_;
     bool        unique_;
 
     // Selection

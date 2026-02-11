@@ -7,13 +7,15 @@
 #include "faker/person.h"
 
 #include <algorithm>
+#include <array>
+#include <cctype>
 #include <format>
+#include <mutex>
 #include <optional>
 #include <random>
 #include <span>
 #include <string>
 #include <string_view>
-#include <vector>
 
 #include "faker/types/bilingual.h"
 #include "faker/types/enums.h"
@@ -33,13 +35,16 @@ constexpr std::size_t phone_number_format_count = kUnitedStatesPhoneNumberFormat
                                                   kChinaPhoneNumberFormat.size() +
                                                   kJapanPhoneNumberFormat.size();
 
-std::vector<PermutationGenerator> phone_number_pg_vector(phone_number_format_count);
-std::vector<uint64_t>             phone_number_capacity(phone_number_format_count);
-std::vector<uint8_t>              phone_number_wildcards(phone_number_format_count);
+std::array<PermutationGenerator, phone_number_format_count> phone_number_pg_vector;
+std::array<uint64_t, phone_number_format_count>             phone_number_capacity{};
+std::array<uint8_t, phone_number_format_count>              phone_number_wildcards{};
+std::array<std::mutex, phone_number_format_count>           phone_number_mutexes{};
 
 PermutationGenerator email_pg(0, 2176782336 - 1, PermutationGenerator::BaseN::Base36);              // 36^6 - 1
 
 PermutationGenerator social_network_id_pg(0, 2176782336 - 1, PermutationGenerator::BaseN::Base36);  // 36^6 - 1
+std::mutex           email_pg_mutex;
+std::mutex           social_network_id_pg_mutex;
 
                                                                                                     // Format full name
 Bilingual format_full_name(const Languages language, const Bilingual& first_name, const Bilingual& last_name) {
@@ -201,6 +206,7 @@ std::string
 
     // Generate a unique phone number if requested
     if (unique) {
+        std::lock_guard<std::mutex> guard(phone_number_mutexes[seq_index]);
         if (phone_number_capacity[seq_index] == 0) {
             const uint64_t wildcard_count = std::count(pattern.begin(), pattern.end(), '#');
             uint64_t       capacity       = 1;
@@ -245,6 +251,12 @@ std::string
     std::string_view selected_domain;
     if (domains.has_value()) {
         check_empty<std::invalid_argument>(domains.value(), "domains");
+        if (std::ranges::any_of(domains.value(), [](const std::string_view domain) { return domain.empty(); })) {
+            throw_exception<std::invalid_argument>(
+                "Invalid string: 'domains' must not contain empty items.",
+                std::source_location::current()
+            );
+        }
         selected_domain = pick_one(domains.value());
     } else {
         selected_domain = pick_one(kEmailDefaultDomains);
@@ -259,7 +271,11 @@ std::string
     std::string user_name = remove_characters(bilingual.translation(), " -");
 
     if (unique) {
-        const std::string seq  = email_pg.next();
+        std::string seq;
+        {
+            std::lock_guard<std::mutex> lock(email_pg_mutex);
+            seq = email_pg.next();
+        }
         user_name             += std::format("_{0}", seq);
     }
 
@@ -301,7 +317,11 @@ Bilingual social_network_id(const Languages languages, const bool unique) {
     std::string social_network_id_translation(social_network_id_view.translation);
 
     if (unique) {
-        const std::string seq          = social_network_id_pg.next();
+        std::string seq;
+        {
+            std::lock_guard<std::mutex> lock(social_network_id_pg_mutex);
+            seq = social_network_id_pg.next();
+        }
         social_network_id_original    += std::format("_{0}", seq);
         social_network_id_translation += std::format("_{0}", seq);
     }
@@ -319,6 +339,12 @@ Person::Person(
     genders_(genders), languages_(languages), regions_(regions), unique_(unique) {
     if (email_domains.has_value()) {
         check_empty<std::invalid_argument>(email_domains.value(), "email_domains");
+        if (std::ranges::any_of(email_domains.value(), [](const std::string_view domain) { return domain.empty(); })) {
+            throw_exception<std::invalid_argument>(
+                "Invalid string: 'email_domains' must not contain empty items.",
+                std::source_location::current()
+            );
+        }
         email_domains_.assign(email_domains.value().begin(), email_domains.value().end());
     } else {
         email_domains_.assign(kEmailDefaultDomains.begin(), kEmailDefaultDomains.end());
@@ -424,7 +450,11 @@ void Person::roll() {
     const auto  full_name_eng = full_name_.translation();
     std::string user_name     = remove_characters(full_name_eng, " -");
     if (unique_) {
-        const std::string seq  = email_pg.next();
+        std::string seq;
+        {
+            std::lock_guard<std::mutex> lock(email_pg_mutex);
+            seq = email_pg.next();
+        }
         user_name             += std::format("_{0}", seq);
     }
     email_ = std::format("{0}@{1}", user_name, selected_domain);

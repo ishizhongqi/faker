@@ -16,10 +16,8 @@ Bilingual::Bilingual() = default;
 Bilingual::Bilingual(const std::string_view original, const std::string_view translation) :
     original_(original), translation_(translation) {}
 
-Bilingual::Bilingual(const BilingualView &bilingual_view) :
+Bilingual::Bilingual(const BilingualView& bilingual_view) :
     original_(bilingual_view.original), translation_(bilingual_view.translation) {}
-
-Bilingual::~Bilingual() = default;
 
 Bilingual::operator std::string() const {
     return original_;
@@ -41,7 +39,15 @@ std::string Bilingual::original() const {
     return original_;
 }
 
+std::string_view Bilingual::original_view() const noexcept {
+    return original_;
+}
+
 std::string Bilingual::translation() const {
+    return translation_;
+}
+
+std::string_view Bilingual::translation_view() const noexcept {
     return translation_;
 }
 
@@ -49,8 +55,8 @@ void Bilingual::swap() {
     std::swap(original_, translation_);
 }
 
-bool Bilingual::empty() const {
-    return original_.empty();
+bool Bilingual::empty() const noexcept {
+    return original_.empty() && translation_.empty();
 }
 
 }  // namespace faker

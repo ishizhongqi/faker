@@ -28,6 +28,7 @@ endif ()
 include(GoogleTest)
 
 set(UT_SOURCES
+        core/test_random_engine.cpp
         modules/test_business.cpp
         modules/test_computer.cpp
         modules/test_datetime.cpp
@@ -40,6 +41,7 @@ set(UT_SOURCES
         utils/test_random_helper.cpp
         utils/test_string_helper.cpp
         utils/test_validation.cpp
+        types/test_permutation_generator.cpp
         types/test_bilingual.cpp
 )
 add_executable(faker_ut ${UT_SOURCES})
@@ -52,6 +54,7 @@ set_project_warnings(faker_ut
 target_include_directories(faker_ut PRIVATE
         ./tests_helper/
         ../src/core
+        ../src/types
         ../src/utils
         ../src/modules/business
         ../src/modules/computer

@@ -38,6 +38,17 @@ TEST(ReplacePlaceholderTest, NoPlaceholders) {
     ASSERT_EQ("Hello, World!", replace_placeholder("Hello, World!", "World"));
 }
 
+TEST(ReplaceWildcardWithSequenceTest, ShouldReplaceAllWildcards) {
+    ASSERT_EQ("AB12CD34", replace_wildcard_with_sequence("AB##CD##", '#', "1234"));
+}
+
+TEST(ReplaceWildcardWithSequenceTest, ShouldThrowWhenReplacementSizeMismatch) {
+    ASSERT_THROW(
+        [[maybe_unused]] const auto value = replace_wildcard_with_sequence("A##", '#', "1"),
+        std::invalid_argument
+    );
+}
+
 TEST(ReplaceWildcardToCharacterTest, MoreThanOneWildcard) {
     const std::string replacement = replace_wildcard_with_character("Hello??", "ABC", '?');
     ASSERT_TRUE(
@@ -69,6 +80,13 @@ TEST(ReplaceWildcardToCharacterTest, OneWildcard) {
 TEST(ReplaceWildcardToCharacterTest, NoWildcard) {
     const std::string replacement = replace_wildcard_with_character("Hello", "ABC", '?');
     ASSERT_EQ("Hello", replacement);
+}
+
+TEST(ReplaceWildcardToCharacterTest, ShouldThrowWhenCharsEmptyAndWildcardExists) {
+    ASSERT_THROW(
+        [[maybe_unused]] const auto value = replace_wildcard_with_character("Hello?", "", '?'),
+        std::invalid_argument
+    );
 }
 
 TEST(ReplaceWildcardsWithSameCharactersTest, MoreThanOneWildcard) {

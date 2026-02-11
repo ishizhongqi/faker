@@ -7,22 +7,21 @@
 #include "faker/payment.h"
 
 #include <algorithm>
+#include <array>
+#include <cctype>
 #include <format>
-#include <iomanip>
+#include <mutex>
 #include <optional>
 #include <random>
 #include <span>
-#include <sstream>
 #include <string>
 #include <string_view>
-#include <vector>
 
 #include "faker/types/enums.h"
 #include "payment_data.h"
 #include "permutation_generator.h"
 #include "random_engine.h"
 #include "random_helper.h"
-#include "safe_localtime.h"
 #include "string_helper.h"
 #include "validation.h"
 
@@ -36,46 +35,39 @@ constexpr std::size_t card_number_format_count = kAmericanExpressCardNumberForma
                                                  kUnionPayCardNumberFormat.size() +
                                                  kVisaCardNumberFormat.size();
 
-std::vector<PermutationGenerator> card_number_pg_vector(card_number_format_count);
-std::vector<uint64_t>             card_number_capacity(card_number_format_count);
-std::vector<uint8_t>              card_number_wildcards(card_number_format_count);
+std::array<PermutationGenerator, card_number_format_count> card_number_pg_vector;
+std::array<uint64_t, card_number_format_count>             card_number_capacity{};
+std::array<uint8_t, card_number_format_count>              card_number_wildcards{};
+std::array<std::mutex, card_number_format_count>           card_number_mutexes{};
 
-std::string g_card_date_format = "%m/%y";
-
-std::tm now() {
-    const std::time_t now = std::time(nullptr);
-    return get_safe_localtime(now);
-}
-
-std::tm parse_time(const std::string& dt, const std::source_location& location = std::source_location::current()) {
-    std::tm tm{};
-    tm          = now();
-    tm.tm_isdst = -1;
-
-    const std::string_view format = g_card_date_format;
-
-    std::istringstream iss{dt};
-    iss.imbue(std::locale::classic());
-    iss >> std::get_time(&tm, std::string(format).c_str());
-    if (iss.fail()) {
+int parse_month_index(
+    const std::string_view      value,
+    const std::source_location& location = std::source_location::current()
+) {
+    if (value.size() != 5 || value[2] != '/' || !std::isdigit(static_cast<unsigned char>(value[0])) ||
+        !std::isdigit(static_cast<unsigned char>(value[1])) || !std::isdigit(static_cast<unsigned char>(value[3])) ||
+        !std::isdigit(static_cast<unsigned char>(value[4]))) {
         throw_exception<std::invalid_argument>(
-            "Invalid format: '" + dt + "' (expected " + std::string(format) + ").",
+            "Invalid format: '" + std::string(value) + "' (expected %m/%y).",
             location
         );
     }
-    iss >> std::ws;
-    if (!iss.eof()) { throw_exception<std::invalid_argument>("Trailing characters in `" + dt + "`.", location); }
 
-    CHECK_TIME_EX(std::invalid_argument, tm, location);
-
-    return tm;
+    const int month = (value[0] - '0') * 10 + (value[1] - '0');
+    const int year  = (value[3] - '0') * 10 + (value[4] - '0');
+    if (month < 1 || month > 12) {
+        throw_exception<std::invalid_argument>(
+            "Invalid date: Month must be between 1 and 12. (Current: " + std::to_string(month) + ")",
+            location
+        );
+    }
+    return year * 12 + (month - 1);
 }
 
-std::string format_time(const std::tm& tm) {
-    std::ostringstream     stream;
-    const std::string_view format = g_card_date_format;
-    stream << std::put_time(&tm, std::string(format).c_str());
-    return stream.str();
+std::string format_month_index(const int month_index) {
+    const int month = month_index % 12 + 1;
+    const int year  = month_index / 12;
+    return std::format("{:02d}/{:02d}", month, year);
 }
 
 std::string get_card_date(
@@ -83,20 +75,15 @@ std::string get_card_date(
     const std::string_view      end_date,
     const std::source_location& location = std::source_location::current()
 ) {
-    auto start_tm = parse_time(std::string(start_date));
-    auto end_tm   = parse_time(std::string(end_date));
-
-    const auto start = std::mktime(&start_tm);
-    const auto end   = std::mktime(&end_tm);
-
+    const int start = parse_month_index(start_date, location);
+    const int end   = parse_month_index(end_date, location);
     CHECK_RANGE_EX(std::invalid_argument, start, end, location);
 
     std::mt19937_64&              random_engine = get_random_engine();
     std::uniform_int_distribution distribution(start, end);
-    const auto                    random_time = distribution(random_engine);
-    const std::tm                 random_tm   = get_safe_localtime(random_time);
+    const int                     random_month_index = distribution(random_engine);
 
-    return format_time(random_tm);
+    return format_month_index(random_month_index);
 }
 
 }  // namespace
@@ -104,6 +91,12 @@ std::string get_card_date(
 std::string payment_method(std::optional<std::span<const std::string_view>> payment_methods) {
     if (payment_methods.has_value()) {
         check_empty<std::invalid_argument>(payment_methods.value(), "payment_methods");
+        if (std::ranges::any_of(payment_methods.value(), [](const std::string_view v) { return v.empty(); })) {
+            throw_exception<std::invalid_argument>(
+                "Invalid string: 'payment_methods' must not contain empty items.",
+                std::source_location::current()
+            );
+        }
         return std::string(pick_one(payment_methods.value()));
     }
     return std::string(pick_one(kPaymentMethodsDefault));
@@ -160,6 +153,7 @@ std::string card_number(const CardTypes card_types, const bool unique) {
     std::string card_number;
 
     if (unique) {
+        std::lock_guard<std::mutex> guard(card_number_mutexes[seq_index]);
         if (card_number_capacity[seq_index] == 0) {
             const uint64_t wildcard_count = std::count(pattern.begin(), pattern.end(), '#');
             uint64_t       capacity       = 1;
@@ -182,20 +176,24 @@ std::string card_number(const CardTypes card_types, const bool unique) {
     return card_number;
 }
 
-std::string card_date(const std::string_view start, const std::string_view end) {
-    CHECK_EMPTY(std::invalid_argument, start);
-    CHECK_EMPTY(std::invalid_argument, end);
-    return get_card_date(start, end);
+std::string card_date(const std::string_view start_month, const std::string_view end_month) {
+    CHECK_EMPTY(std::invalid_argument, start_month);
+    CHECK_EMPTY(std::invalid_argument, end_month);
+    return get_card_date(start_month, end_month);
 }
 
 Card::Card(
     const Languages        languages,
     const CardTypes        card_types,
-    const std::string_view start,
-    const std::string_view end,
+    const std::string_view start_month,
+    const std::string_view end_month,
     const bool             unique
 ) :
-    languages_(languages), card_types_(card_types), start_(start), end_(end), unique_(unique) {
+    languages_(languages),
+    card_types_(card_types),
+    start_month_(start_month),
+    end_month_(end_month),
+    unique_(unique) {
     roll();
 }
 
@@ -226,7 +224,7 @@ void Card::roll() {
     card_type_      = pick_card_type(card_types_);
     type_           = std::string(kCardTypes.at(language_).at(card_type_));
     number_         = card_number(card_types_, unique_);
-    date_           = get_card_date(start_, end_, location);
+    date_           = get_card_date(start_month_, end_month_, location);
     payment_method_ = "Credit Card";
 }
 

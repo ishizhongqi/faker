@@ -47,7 +47,7 @@ FAKER_EXPORT std::string mac_address(bool unique = false);
 /// @return A file path.
 /// @code
 /// faker::computer::file_path(); // "C:\Users\Administrator\docs\car_20"
-/// faker::computer::file_path(OperatingSystems::macOS, {});  // "/Users/Administrator/video/beauty_Kc6387"
+/// faker::computer::file_path(OperatingSystems::macOS);  // "/Users/Administrator/video/beauty_Kc6387"
 /// faker::computer::file_path(OperatingSystems::macOS | OperatingSystems::Linux,
 ///                            std::to_array<std::string_view>({"jpg", "png"}));
 /// // "/Users/VincentLau/images/airplane_fJ1471.jpg" or "/home/Administrator/images/gust8462.png"
@@ -76,7 +76,7 @@ FAKER_EXPORT std::string file_directory(OperatingSystems operating_systems = Ope
 /// @code
 /// faker::computer::file_name();  // "jane89"
 /// faker::computer::file_name(std::to_array<std::string_view>({"jpg", "png"}));  // "ocean_AJ22.png"
-/// faker::computer::file_name({});  // "adam"
+/// faker::computer::file_name();  // "adam"
 /// @endcode
 FAKER_EXPORT std::string file_name(std::span<const std::string_view> extensions = {});
 
@@ -88,7 +88,7 @@ FAKER_EXPORT std::string file_name(std::span<const std::string_view> extensions 
 /// @code
 /// faker::computer::file_extension();  // ""
 /// faker::computer::file_extension(std::to_array<std::string_view>({"jpg", "png"}));  // "jpg"
-/// faker::computer::file_extension({});  // ""
+/// faker::computer::file_extension();  // ""
 /// @endcode
 FAKER_EXPORT std::string file_extension(std::span<const std::string_view> extensions = {});
 

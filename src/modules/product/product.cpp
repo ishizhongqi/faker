@@ -7,13 +7,14 @@
 #include "faker/product.h"
 
 #include <algorithm>
+#include <array>
 #include <format>
+#include <mutex>
 #include <optional>
 #include <span>
 #include <stdexcept>
 #include <string>
 #include <string_view>
-#include <vector>
 
 #include "faker/types/enums.h"
 #include "permutation_generator.h"
@@ -31,9 +32,10 @@ constexpr std::size_t barcode_format_count = kBarcodeEAN13Formats.size() +
                                              kBarcodeUPCEFormats.size() +
                                              kBarcodeISBNFormats.size();
 
-std::vector<PermutationGenerator> barcode_pg_vector(barcode_format_count);
-std::vector<uint64_t>             barcode_capacity(barcode_format_count);
-std::vector<uint8_t>              barcode_wildcards(barcode_format_count);
+std::array<PermutationGenerator, barcode_format_count> barcode_pg_vector;
+std::array<uint64_t, barcode_format_count>             barcode_capacity{};
+std::array<uint8_t, barcode_format_count>              barcode_wildcards{};
+std::array<std::mutex, barcode_format_count>           barcode_mutexes{};
 
 }  // namespace
 
@@ -41,6 +43,12 @@ std::string product_name(const Languages languages, const std::optional<std::spa
     std::string_view keyword;
     if (keywords.has_value()) {
         check_empty<std::invalid_argument>(keywords.value(), "keywords");
+        if (std::ranges::any_of(keywords.value(), [](const std::string_view value) { return value.empty(); })) {
+            throw_exception<std::invalid_argument>(
+                "Invalid string: 'keywords' must not contain empty items.",
+                std::source_location::current()
+            );
+        }
         keyword = pick_one(keywords.value());
     } else {
         keyword = pick_one(kProductNameDefaultKeywords);
@@ -135,6 +143,7 @@ std::string barcode(const BarcodeTypes barcode_types, const bool unique) {
     std::string barcode;
 
     if (unique) {
+        std::lock_guard<std::mutex> guard(barcode_mutexes[seq_index]);
         if (barcode_capacity[seq_index] == 0) {
             const uint64_t wildcard_count = std::count(pattern.begin(), pattern.end(), '#');
             uint64_t       capacity       = 1;

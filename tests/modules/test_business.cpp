@@ -6,8 +6,14 @@
 
 #include <gtest/gtest.h>
 
+#include <array>
+#include <mutex>
+#include <thread>
+#include <vector>
+
 #include "business_data.h"
 #include "faker/business.h"
+#include "random_engine.h"
 #include "tests_helper.h"
 
 using namespace ::testing;
@@ -55,3 +61,80 @@ INSTANTIATE_TEST_SUITE_P(
     ),
     [](const TestParamInfo<Languages>& param_info) { return to_string(param_info.param); }
 );
+
+TEST(BusinessTest, ShouldHaveCompleteIndustryMappingsForAllLanguages) {
+    constexpr std::array all_industries = {
+        Industries::Catering,
+        Industries::Consulting,
+        Industries::Electronics,
+        Industries::Engineering,
+        Industries::FinancialServices,
+        Industries::Industrial,
+        Industries::InformationTechnology,
+        Industries::LandedProperty,
+        Industries::Logistic,
+        Industries::Manufacturing,
+        Industries::Pharmaceutical,
+        Industries::Telecommunication,
+        Industries::Trading,
+    };
+    constexpr std::array all_languages = {
+        Languages::English,
+        Languages::SimplifiedChinese,
+        Languages::TraditionalChinese,
+        Languages::Japanese,
+    };
+
+    for (const auto language : all_languages) {
+        const auto industries_it = kIndustries.find(language);
+        ASSERT_NE(industries_it, kIndustries.end());
+        const auto words_it = kBusinessWords.find(language);
+        ASSERT_NE(words_it, kBusinessWords.end());
+
+        for (const auto industry : all_industries) {
+            ASSERT_NE(industries_it->second.find(industry), industries_it->second.end());
+            const auto industry_words_it = words_it->second.find(industry);
+            ASSERT_NE(industry_words_it, words_it->second.end());
+            ASSERT_FALSE(industry_words_it->second.empty());
+        }
+    }
+}
+
+TEST(BusinessTest, ShouldGenerateDeterministicCompanyNameWhenSeeded) {
+    seed_random_engine(20260211ULL);
+    const Bilingual first = company_name(Languages::English);
+    seed_random_engine(20260211ULL);
+    const Bilingual second = company_name(Languages::English);
+    ASSERT_EQ(first.original(), second.original());
+    ASSERT_EQ(first.translation(), second.translation());
+}
+
+TEST(BusinessTest, ShouldGenerateCompanyConcurrently) {
+    std::vector<Company> companies;
+    companies.reserve(400);
+    std::mutex companies_mutex;
+
+    auto worker = [&companies, &companies_mutex]() {
+        for (int i = 0; i < 100; ++i) {
+            Company company(Languages::English);
+            std::lock_guard<std::mutex> lock(companies_mutex);
+            companies.push_back(company);
+        }
+    };
+
+    std::thread t1(worker);
+    std::thread t2(worker);
+    std::thread t3(worker);
+    std::thread t4(worker);
+    t1.join();
+    t2.join();
+    t3.join();
+    t4.join();
+
+    ASSERT_EQ(companies.size(), 400U);
+    for (const auto& company : companies) {
+        ASSERT_FALSE(company.name().original().empty());
+        ASSERT_FALSE(company.name().translation().empty());
+        ASSERT_FALSE(company.industry().empty());
+    }
+}

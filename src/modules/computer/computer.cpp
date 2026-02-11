@@ -6,9 +6,11 @@
 
 #include "faker/computer.h"
 
+#include <algorithm>
 #include <format>
 #include <optional>
 #include <random>
+#include <source_location>
 #include <span>
 #include <string>
 #include <string_view>
@@ -34,6 +36,71 @@ PermutationGenerator mac_pg(100000000ULL, 100000000000ULL - 1);
 
 PermutationGenerator url_pg(0, 2176782336 - 1, PermutationGenerator::BaseN::Base36);       //  36^6 - 1
 PermutationGenerator hostname_pg(0, 2176782336 - 1, PermutationGenerator::BaseN::Base36);  //  36^6 - 1
+
+constexpr std::size_t kUniqueSuffixWidth = 6;
+constexpr std::string_view kBase36Chars  = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+std::string get_username();
+
+void validate_non_empty_items(
+    const std::span<const std::string_view> values,
+    const std::string_view                  name,
+    const std::source_location&             location = std::source_location::current()
+) {
+    if (std::ranges::any_of(values, [](const std::string_view value) { return value.empty(); })) {
+        throw_exception<std::invalid_argument>(
+            "Invalid string: '" + std::string(name) + "' must not contain empty items.",
+            location
+        );
+    }
+}
+
+std::string to_base36_fixed_width(uint64_t value, const std::size_t width) {
+    std::string out(width, '0');
+    for (std::size_t i = 0; i < width; ++i) {
+        out[width - 1 - i] = kBase36Chars[value % 36];
+        value /= 36;
+    }
+    return out;
+}
+
+std::string generate_host_value(
+    const std::span<const std::string_view>          subdomains,
+    std::optional<std::span<const std::string_view>> tlds,
+    const bool                                       unique,
+    PermutationGenerator&                            generator,
+    const bool                                       include_protocol
+) {
+    if (!subdomains.empty()) { validate_non_empty_items(subdomains, "subdomains"); }
+
+    std::string subdomain;
+    std::string tld;
+
+    if (!subdomains.empty()) { subdomain = std::string(pick_one(subdomains)); }
+
+    if (tlds.has_value()) {
+        check_empty<std::invalid_argument>(tlds.value(), "tlds");
+        validate_non_empty_items(tlds.value(), "tlds");
+        tld = std::string(pick_one(tlds.value()));
+    } else {
+        tld = std::string(pick_one(kTldsDefault));
+    }
+
+    std::string username = get_username();
+    if (unique) {
+        username += to_base36_fixed_width(generator.next_uint64(), kUniqueSuffixWidth);
+    }
+
+    std::string host;
+    if (subdomain.empty()) {
+        host = username + "." + tld;
+    } else {
+        host = subdomain + "." + username + "." + tld;
+    }
+
+    if (!include_protocol) { return host; }
+    return "https://" + host;
+}
 
 FileTypes pick_file_type() {
     constexpr std::array file_types = {
@@ -274,30 +341,7 @@ std::string url(
     std::optional<std::span<const std::string_view>> tlds,
     const bool                                       unique
 ) {
-    std::string subdomain;
-    std::string tld;
-
-    if (subdomains.empty()) {
-        subdomain = "";
-    } else {
-        subdomain = std::string(pick_one(subdomains));
-    }
-
-    if (tlds.has_value()) {
-        check_empty<std::invalid_argument>(tlds.value(), "tlds");
-        tld = std::string(pick_one(tlds.value()));
-    } else {
-        tld = std::string(pick_one(kTldsDefault));
-    }
-
-    std::string username = get_username();
-    if (unique) {
-        const std::string seq  = url_pg.next();
-        username              += seq;
-    }
-
-    if (subdomain.empty()) { return "https://" + username + "." + tld; }
-    return "https://" + subdomain + "." + username + "." + tld;
+    return generate_host_value(subdomains, tlds, unique, url_pg, true);
 }
 
 std::string hostname(
@@ -305,30 +349,7 @@ std::string hostname(
     std::optional<std::span<const std::string_view>> tlds,
     const bool                                       unique
 ) {
-    std::string subdomain;
-    std::string tld;
-
-    if (subdomains.empty()) {
-        subdomain = "";
-    } else {
-        subdomain = std::string(pick_one(subdomains));
-    }
-
-    if (tlds.has_value()) {
-        check_empty<std::invalid_argument>(tlds.value(), "tlds");
-        tld = std::string(pick_one(tlds.value()));
-    } else {
-        tld = std::string(pick_one(kTldsDefault));
-    }
-
-    std::string username = get_username();
-    if (unique) {
-        const std::string seq  = hostname_pg.next();
-        username              += seq;
-    }
-
-    if (subdomain.empty()) { return username + "." + tld; }
-    return subdomain + "." + username + "." + tld;
+    return generate_host_value(subdomains, tlds, unique, hostname_pg, false);
 }
 
 File::File(const OperatingSystems operating_systems, const std::span<const std::string_view> extensions) :

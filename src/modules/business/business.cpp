@@ -8,6 +8,7 @@
 
 #include <format>
 #include <random>
+#include <stdexcept>
 
 #include "business_data.h"
 #include "faker/types/bilingual.h"
@@ -15,6 +16,7 @@
 #include "person_data.h"
 #include "random_engine.h"
 #include "random_helper.h"
+#include "validation.h"
 
 namespace faker::business {
 
@@ -45,12 +47,22 @@ Industries pick_industry() {
 
 // Get a company name
 Bilingual get_company_name(const Languages language, const Industries industry) {
-    BilingualView business_words_view;
-    if (const auto selected_language_it = kBusinessWords.find(language); selected_language_it != kBusinessWords.end()) {
-        const auto& industries_map = selected_language_it->second;
-        const auto  industries_it  = industries_map.find(industry);
-        business_words_view        = pick_one(industries_it->second);
+    const auto selected_language_it = kBusinessWords.find(language);
+    if (selected_language_it == kBusinessWords.end()) {
+        throw_exception<std::logic_error>(
+            "Invalid business data: missing business words for selected language.",
+            std::source_location::current()
+        );
     }
+    const auto& industries_map = selected_language_it->second;
+    const auto  industries_it  = industries_map.find(industry);
+    if (industries_it == industries_map.end()) {
+        throw_exception<std::logic_error>(
+            "Invalid business data: missing business words for selected industry.",
+            std::source_location::current()
+        );
+    }
+    const BilingualView business_words_view = pick_one(industries_it->second);
 
     BilingualView company_suffixes_view;
     BilingualView last_name_suffixes_view;
@@ -115,13 +127,22 @@ Bilingual get_company_name(const Languages language, const Industries industry) 
 }
 
 std::string get_industry(const Languages languages, const Industries industry) {
-    std::string_view industry_string;
-    if (const auto selected_language_it = kIndustries.find(languages); selected_language_it != kIndustries.end()) {
-        const auto& industries_map = selected_language_it->second;
-        const auto  industries_it  = industries_map.find(industry);
-        industry_string            = industries_it->second;
+    const auto selected_language_it = kIndustries.find(languages);
+    if (selected_language_it == kIndustries.end()) {
+        throw_exception<std::logic_error>(
+            "Invalid business data: missing industries for selected language.",
+            std::source_location::current()
+        );
     }
-    return std::string(industry_string);
+    const auto& industries_map = selected_language_it->second;
+    const auto  industries_it  = industries_map.find(industry);
+    if (industries_it == industries_map.end()) {
+        throw_exception<std::logic_error>(
+            "Invalid business data: missing selected industry.",
+            std::source_location::current()
+        );
+    }
+    return std::string(industries_it->second);
 }
 
 }  // namespace

@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <array>
 #include <regex>
+#include <unordered_set>
+#include <vector>
 
 #include "computer_data.h"
 #include "faker/computer.h"
@@ -276,6 +278,29 @@ TEST(ComputerTest, ShouldThrowExceptionWhenTldsOfUrlIsEmpty) {
     ASSERT_THROW(url(std::to_array<std::string_view>({"auth", "drive", "image"}), empty_tlds), std::invalid_argument);
 }
 
+TEST(ComputerTest, ShouldThrowExceptionWhenTldsOfUrlContainEmptyItem) {
+    ASSERT_THROW(
+        url(std::to_array<std::string_view>({"auth"}), std::to_array<std::string_view>({"", "com"})),
+        std::invalid_argument
+    );
+}
+
+TEST(ComputerTest, ShouldThrowExceptionWhenSubdomainsOfUrlContainEmptyItem) {
+    ASSERT_THROW(
+        url(std::to_array<std::string_view>({"", "auth"}), std::to_array<std::string_view>({"com"})),
+        std::invalid_argument
+    );
+}
+
+TEST(ComputerTest, ShouldGenerateUniqueUrlAcrossMultipleCalls) {
+    std::unordered_set<std::string> values;
+    values.reserve(128);
+    for (int i = 0; i < 128; ++i) {
+        values.insert(url({}, std::to_array<std::string_view>({"com"}), true));
+    }
+    ASSERT_EQ(values.size(), 128U);
+}
+
 TEST(ComputerTest, ShouldGenerateHostnameWithSubdomain) {
     const auto generated_hostname = hostname(
         std::to_array<std::string_view>({"auth", "drive", "image"}),
@@ -313,4 +338,27 @@ TEST(ComputerTest, ShouldThrowExceptionWhenTldsOfHostnameIsEmpty) {
         hostname(std::to_array<std::string_view>({"auth", "drive", "image"}), empty_tlds),
         std::invalid_argument
     );
+}
+
+TEST(ComputerTest, ShouldThrowExceptionWhenTldsOfHostnameContainEmptyItem) {
+    ASSERT_THROW(
+        hostname(std::to_array<std::string_view>({"auth"}), std::to_array<std::string_view>({"", "com"})),
+        std::invalid_argument
+    );
+}
+
+TEST(ComputerTest, ShouldThrowExceptionWhenSubdomainsOfHostnameContainEmptyItem) {
+    ASSERT_THROW(
+        hostname(std::to_array<std::string_view>({"", "auth"}), std::to_array<std::string_view>({"com"})),
+        std::invalid_argument
+    );
+}
+
+TEST(ComputerTest, ShouldGenerateUniqueHostnameAcrossMultipleCalls) {
+    std::unordered_set<std::string> values;
+    values.reserve(128);
+    for (int i = 0; i < 128; ++i) {
+        values.insert(hostname({}, std::to_array<std::string_view>({"com"}), true));
+    }
+    ASSERT_EQ(values.size(), 128U);
 }

@@ -7,11 +7,17 @@
 #include <gtest/gtest.h>
 
 #include <algorithm>
+#include <array>
+#include <ctime>
+#include <iomanip>
 #include <regex>
+#include <sstream>
 #include <string>
+#include <thread>
 
 #include "faker/datetime.h"
 #include "faker/types/enums.h"
+#include "random_engine.h"
 #include "string_helper.h"
 
 using namespace ::testing;
@@ -161,4 +167,41 @@ TEST(DateTimeTest, ShouldThrowExceptionForEmptyDatesAndTimes) {
         datetime::datetime("2020-01-01", "2020-01-01", "08:00:00", "", DaysOfWeek::Monday),
         std::invalid_argument
     );
+}
+
+TEST(DateTimeTest, ShouldRespectSpecificWeekdayFilter) {
+    const std::string generated_date = date("2024-01-01", "2024-01-31", DaysOfWeek::Monday);
+
+    std::tm tm{};
+    std::istringstream iss(generated_date);
+    iss >> std::get_time(&tm, "%Y-%m-%d");
+    ASSERT_FALSE(iss.fail());
+    tm.tm_isdst = -1;
+    ASSERT_NE(std::mktime(&tm), -1);
+    ASSERT_EQ(tm.tm_wday, 1);
+}
+
+TEST(DateTimeTest, ShouldGenerateDeterministicDatetimeWhenSeeded) {
+    seed_random_engine(20260211ULL);
+    const std::string first = datetime::datetime("2020-01-01", "2020-12-31", "08:00:00", "17:00:00");
+    seed_random_engine(20260211ULL);
+    const std::string second = datetime::datetime("2020-01-01", "2020-12-31", "08:00:00", "17:00:00");
+    ASSERT_EQ(first, second);
+}
+
+TEST(DateTimeTest, ShouldGenerateDateConcurrentlyWithinRange) {
+    std::array<std::string, 2> results;
+    std::thread                t1(
+        [&results]() { results[0] = date("2020-01-01", "2020-12-31", DaysOfWeek::Monday | DaysOfWeek::Friday); }
+    );
+    std::thread                t2(
+        [&results]() { results[1] = date("2020-01-01", "2020-12-31", DaysOfWeek::Monday | DaysOfWeek::Friday); }
+    );
+    t1.join();
+    t2.join();
+
+    ASSERT_GE(results[0], "2020-01-01");
+    ASSERT_LE(results[0], "2020-12-31");
+    ASSERT_GE(results[1], "2020-01-01");
+    ASSERT_LE(results[1], "2020-12-31");
 }

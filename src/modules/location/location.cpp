@@ -7,6 +7,7 @@
 #include "faker/location.h"
 
 #include <format>
+#include <stdexcept>
 #include <string>
 #include <tuple>
 
@@ -15,6 +16,7 @@
 #include "location_data.h"
 #include "random_helper.h"
 #include "string_helper.h"
+#include "validation.h"
 
 namespace faker::location {
 
@@ -32,15 +34,21 @@ AddressComponents pick_address_component(const Regions region) {
 }
 
 BilingualView get_city(const Regions region, const AddressComponents& address_components) {
-    int city_level = 1;
+    std::size_t city_level = 1;
     switch (region) {
-    case Regions::UnitedStates : city_level = KUnitedStatesCityLevel; break;
-    case Regions::UnitedKingdom: city_level = KUnitedKingdomCityLevel; break;
-    case Regions::China        : city_level = KChinaCityLevel; break;
-    case Regions::Japan        : city_level = KJapanCityLevel; break;
+    case Regions::UnitedStates : city_level = static_cast<std::size_t>(KUnitedStatesCityLevel); break;
+    case Regions::UnitedKingdom: city_level = static_cast<std::size_t>(KUnitedKingdomCityLevel); break;
+    case Regions::China        : city_level = static_cast<std::size_t>(KChinaCityLevel); break;
+    case Regions::Japan        : city_level = static_cast<std::size_t>(KJapanCityLevel); break;
     }
 
-    if (city_level > address_components.admin_levels.size()) { city_level = 0; }
+    if (address_components.admin_levels.empty()) {
+        throw_exception<std::logic_error>(
+            "Invalid address data: 'admin_levels' must not be empty.",
+            std::source_location::current()
+        );
+    }
+    if (city_level >= address_components.admin_levels.size()) { city_level = 0; }
 
     return address_components.admin_levels[city_level];
 }

@@ -50,6 +50,20 @@ TYPED_TEST(ThrowExceptionTest, CheckRange) {
     ASSERT_THROW(check_range<ExceptionT>(10, "range_start", 3, "range_end"), ExceptionT);
 }
 
+TEST(ValidationMacroTest, CheckRangeTypedSupportsMixedTypes) {
+    const int64_t range_start = 0;
+    const int32_t range_end   = 10;
+    const auto invoke = [&]() { CHECK_RANGE_T(std::invalid_argument, int64_t, range_start, range_end); };
+    ASSERT_NO_THROW(invoke());
+}
+
+TEST(ValidationMacroTest, CheckRangeTypedRejectsInvalidMixedTypes) {
+    const int64_t range_start = 10;
+    const int32_t range_end   = 3;
+    const auto invoke = [&]() { CHECK_RANGE_T(std::invalid_argument, int64_t, range_start, range_end); };
+    ASSERT_THROW(invoke(), std::invalid_argument);
+}
+
 TYPED_TEST(ThrowExceptionTest, CheckTimeIfMonthValid) {
     using ExceptionT = TypeParam;
     tm tm{};

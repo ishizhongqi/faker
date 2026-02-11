@@ -7,11 +7,16 @@
 #include <gtest/gtest.h>
 
 #include <array>
+#include <mutex>
 #include <regex>
 #include <string>
+#include <thread>
+#include <unordered_set>
+#include <vector>
 
 #include "faker/payment.h"
 #include "faker/types/enums.h"
+#include "random_engine.h"
 #include "tests_helper.h"
 
 using namespace ::testing;
@@ -30,16 +35,16 @@ struct CardNumberParam {
 };
 
 struct CardDateParam {
-    std::string_view start;
-    std::string_view end;
+    std::string_view start_month;
+    std::string_view end_month;
     std::string      name;
 };
 
 struct CardParam {
     Languages        languages;
     CardTypes        card_types;
-    std::string_view start;
-    std::string_view end;
+    std::string_view start_month;
+    std::string_view end_month;
     std::string      name;
 };
 
@@ -57,6 +62,13 @@ TEST(PaymentTest, ShouldGeneratePaymentMethodWhenNullOptional) {
 TEST(PaymentTest, ShouldThrowExceptionWhenPaymentMethodsIsEmpty) {
     std::vector<std::string_view> empty_payment_methods = {};
     ASSERT_THROW(payment_method(empty_payment_methods), std::invalid_argument);
+}
+
+TEST(PaymentTest, ShouldThrowExceptionWhenPaymentMethodsContainsEmptyItem) {
+    ASSERT_THROW(
+        payment_method(std::to_array<std::string_view>({"Credit Card", ""})),
+        std::invalid_argument
+    );
 }
 
 class CardTypeLanguagesTest : public TestWithParam<Languages> {};
@@ -149,8 +161,48 @@ TEST(CardTest, ShouldThrowExceptionWhenDateIsEmpty) {
 TEST(CardTest, ShouldThrowExceptionWhenDateIsInvalid) {
     ASSERT_THROW(card_date("invalid", "12/10"), std::invalid_argument);
     ASSERT_THROW(card_date("01/01", "invalid"), std::invalid_argument);
+    ASSERT_THROW(card_date("13/01", "12/10"), std::invalid_argument);
+    ASSERT_THROW(card_date("00/01", "12/10"), std::invalid_argument);
 }
 
 TEST(CardTest, ShouldThrowExceptionWhenStartDateIsAfterEndDate) {
     ASSERT_THROW(card_date("12/10", "01/01"), std::invalid_argument);
+}
+
+TEST(CardTest, ShouldGenerateExactCardDateWhenRangeCollapsed) {
+    ASSERT_EQ(card_date("02/24", "02/24"), "02/24");
+}
+
+TEST(CardTest, ShouldGenerateDeterministicCardDateWhenSeeded) {
+    seed_random_engine(20260211ULL);
+    const std::string first = card_date("01/00", "12/50");
+    seed_random_engine(20260211ULL);
+    const std::string second = card_date("01/00", "12/50");
+    ASSERT_EQ(first, second);
+}
+
+TEST(CardTest, ShouldGenerateUniqueCardNumberAcrossThreads) {
+    std::vector<std::string> generated;
+    generated.reserve(400);
+    std::mutex generated_mutex;
+
+    auto worker = [&generated, &generated_mutex]() {
+        for (int i = 0; i < 100; ++i) {
+            const std::string value = card_number(CardTypes::MasterCard, true);
+            std::lock_guard<std::mutex> lock(generated_mutex);
+            generated.push_back(value);
+        }
+    };
+
+    std::thread t1(worker);
+    std::thread t2(worker);
+    std::thread t3(worker);
+    std::thread t4(worker);
+    t1.join();
+    t2.join();
+    t3.join();
+    t4.join();
+
+    std::unordered_set<std::string> unique_values(generated.begin(), generated.end());
+    ASSERT_EQ(unique_values.size(), generated.size());
 }

@@ -132,7 +132,7 @@ FAKER_EXPORT std::string phone_number(
 /// @code
 /// faker::person::email();  // "CannonDean7011@gmail.com"
 /// faker::person::email(faker::Languages::SimplifiedChinese | faker::Languages::TraditionalChinese,
-///                      {"163.com", "qq.com"});  // "LengYiyi987@163.com"
+///                      std::to_array<std::string_view>({"163.com", "qq.com"}));  // "LengYiyi987@163.com"
 /// @endcode
 /// @note The unique option has a runtime generation limit. Exceeding it may cause errors.
 FAKER_EXPORT std::string email(
@@ -179,7 +179,12 @@ FAKER_EXPORT Bilingual social_network_id(Languages languages = Languages::Englis
 /// p1.job_title();  // "Dentist"
 /// p1.social_network_id();  // "DynaraKing"
 /// faker::person::Person
-/// p2(faker::Genders::F, faker::Languages::TraditionalChinese, faker::Regions::China, {"qq.com", "163.com"});
+/// p2(
+///     faker::Genders::F,
+///     faker::Languages::TraditionalChinese,
+///     faker::Regions::China,
+///     std::to_array<std::string_view>({"qq.com", "163.com"})
+/// );
 /// p2.first_name();  // "左詩晴"
 /// p2.last_name();  // "詩晴"
 /// p2.full_name();  // "左"

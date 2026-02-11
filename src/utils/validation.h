@@ -13,6 +13,7 @@
 #include <span>
 #include <string>
 #include <string_view>
+#include <type_traits>
 
 #include "faker/internal/export.h"
 
@@ -47,7 +48,7 @@ void check_empty(
     const std::source_location& location = std::source_location::current()
 ) {
     if (value.empty()) {
-        throw_exception<E>("Invalid string: '" + std::string(name) + "' must not be empty.", location);
+        throw_exception<E>("Invalid value: '" + std::string(name) + "' must not be empty.", location);
     }
 }
 
@@ -62,13 +63,15 @@ void check_range(
     const std::string_view      range_end_name,
     const std::source_location& location = std::source_location::current()
 ) {
+    static_assert(std::is_arithmetic_v<T>, "check_range requires arithmetic type");
+
     if (range_start == 0 && range_start_name == "0" && range_end < range_start) {
         throw_exception<E>(
             "Invalid range: '" +
                 std::string(range_end_name) +
                 "' must be greater than 0."
                 " (Current: " +
-                std::to_string(range_start) +
+                std::to_string(range_end) +
                 ")",
             location
         );
@@ -98,7 +101,7 @@ void check_range(
 #define CHECK_RANGE_T_EX(exception_type, T, range_start, range_end, location) \
     check_range<exception_type, T>(range_start, #range_start, range_end, #range_end, location)
 #define CHECK_RANGE_T(exception_type, T, range_start, range_end) \
-    CHECK_RANGE_EX(exception_type, range_start, range_end, std::source_location::current())
+    CHECK_RANGE_T_EX(exception_type, T, range_start, range_end, std::source_location::current())
 
 template <typename E>
 void check_time(const tm& time, const std::source_location& location = std::source_location::current()) {

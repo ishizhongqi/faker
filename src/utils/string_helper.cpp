@@ -7,8 +7,11 @@
 #include "string_helper.h"
 
 #include <algorithm>
+#include <array>
+#include <cctype>
 #include <string>
 #include <string_view>
+#include <stdexcept>
 #include <vector>
 
 #include "random_engine.h"
@@ -28,12 +31,15 @@ std::string capitalize(const std::string_view word) {
 }
 
 std::string remove_characters(const std::string_view source_string, const std::string_view chars_to_remove) {
-    std::string new_string;
-    new_string.reserve(source_string.size());  // Optional: reserve capacity to avoid multiple reallocations
+    std::array<bool, 256> should_remove{};
+    for (const char c : chars_to_remove) { should_remove[static_cast<unsigned char>(c)] = true; }
+
+    std::string out;
+    out.reserve(source_string.size());
     for (const char c : source_string) {
-        if (chars_to_remove.find(c) == std::string_view::npos) { new_string += c; }
+        if (!should_remove[static_cast<unsigned char>(c)]) { out.push_back(c); }
     }
-    return new_string;
+    return out;
 }
 
 std::string replace_placeholder(std::string_view pattern, const std::string_view replacement) {
@@ -55,24 +61,46 @@ std::string replace_wildcard_with_sequence(
     const char             wildcard,
     const std::string_view replacement
 ) {
+    const std::size_t wildcard_count = static_cast<std::size_t>(std::count(pattern.begin(), pattern.end(), wildcard));
+    if (wildcard_count != replacement.size()) {
+        throw std::invalid_argument("Replacement size must match wildcard count.");
+    }
+
     std::string out;
     out.reserve(pattern.size());
 
-    int i = 0;
-    for (const char c : pattern) { c == wildcard ? out += replacement[i++] : out += c; }
+    std::size_t i = 0;
+    for (const char c : pattern) {
+        if (c == wildcard) {
+            out.push_back(replacement[i]);
+            ++i;
+        } else {
+            out.push_back(c);
+        }
+    }
 
     return out;
 }
 
 std::string
     replace_wildcard_with_character(const std::string_view pattern, const std::string_view chars, const char wildcard) {
+    if (chars.empty() && std::find(pattern.begin(), pattern.end(), wildcard) != pattern.end()) {
+        throw std::invalid_argument("chars must not be empty when wildcard exists in pattern.");
+    }
+
     std::string out;
     out.reserve(pattern.size());
 
     std::mt19937_64&                      random_engine = get_random_engine();
     std::uniform_int_distribution<size_t> digits_distribution(0, chars.size() - 1);
 
-    for (const char c : pattern) { c == wildcard ? out += chars[digits_distribution(random_engine)] : out += c; }
+    for (const char c : pattern) {
+        if (c == wildcard) {
+            out.push_back(chars[digits_distribution(random_engine)]);
+        } else {
+            out.push_back(c);
+        }
+    }
 
     return out;
 }
@@ -101,7 +129,14 @@ std::pair<std::string, std::string> replace_wildcards_with_same_characters(
         size_t      index = 0;
         std::string result;
         result.reserve(pattern.size());
-        for (char c : pattern) { result += c == wildcard ? random_chars[index++] : c; }
+        for (const char c : pattern) {
+            if (c == wildcard) {
+                result.push_back(random_chars[index]);
+                ++index;
+            } else {
+                result.push_back(c);
+            }
+        }
         return result;
     };
 

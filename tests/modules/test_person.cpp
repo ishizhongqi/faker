@@ -7,11 +7,16 @@
 #include <gtest/gtest.h>
 
 #include <array>
+#include <mutex>
 #include <regex>
 #include <string>
+#include <thread>
+#include <unordered_set>
+#include <vector>
 
 #include "faker/person.h"
 #include "faker/types/enums.h"
+#include "random_engine.h"
 #include "tests_helper.h"
 
 using namespace ::testing;
@@ -313,10 +318,113 @@ TEST(PersonTest, ShouldThrowExceptionrWhenEmailDomainsIsEmpty) {
     ASSERT_THROW(email(Languages::English, empty_email_domains), std::invalid_argument);
 }
 
+TEST(PersonTest, ShouldThrowExceptionWhenEmailDomainsContainEmptyItem) {
+    ASSERT_THROW(email(Languages::English, std::to_array<std::string_view>({"gmail.com", ""})), std::invalid_argument);
+}
+
 TEST(PersonTest, ShouldThrowExceptionrWhenPersonEmailDomainsIsEmpty) {
     std::vector<std::string_view> empty_email_domains = {};
     ASSERT_THROW(
         Person generated_person(Genders::M, Languages::English, Regions::UnitedStates, empty_email_domains),
         std::invalid_argument
     );
+}
+
+TEST(PersonTest, ShouldThrowExceptionWhenPersonEmailDomainsContainEmptyItem) {
+    ASSERT_THROW(
+        Person generated_person(
+            Genders::M,
+            Languages::English,
+            Regions::UnitedStates,
+            std::to_array<std::string_view>({"gmail.com", ""})
+        ),
+        std::invalid_argument
+    );
+}
+
+TEST(PersonTest, ShouldGenerateDeterministicEmailWhenSeeded) {
+    seed_random_engine(20260211ULL);
+    const std::string first = email(Languages::English, std::to_array<std::string_view>({"example.com"}), false);
+    seed_random_engine(20260211ULL);
+    const std::string second = email(Languages::English, std::to_array<std::string_view>({"example.com"}), false);
+    ASSERT_EQ(first, second);
+}
+
+TEST(PersonTest, ShouldGenerateUniqueEmailAcrossThreads) {
+    std::vector<std::string> generated;
+    generated.reserve(400);
+    std::mutex generated_mutex;
+
+    auto worker = [&generated, &generated_mutex]() {
+        for (int i = 0; i < 100; ++i) {
+            const std::string value =
+                email(Languages::English, std::to_array<std::string_view>({"example.com"}), true);
+            std::lock_guard<std::mutex> lock(generated_mutex);
+            generated.push_back(value);
+        }
+    };
+
+    std::thread t1(worker);
+    std::thread t2(worker);
+    std::thread t3(worker);
+    std::thread t4(worker);
+    t1.join();
+    t2.join();
+    t3.join();
+    t4.join();
+
+    std::unordered_set<std::string> unique_values(generated.begin(), generated.end());
+    ASSERT_EQ(unique_values.size(), generated.size());
+}
+
+TEST(PersonTest, ShouldGenerateUniquePhoneNumberAcrossThreads) {
+    std::vector<std::string> generated;
+    generated.reserve(400);
+    std::mutex generated_mutex;
+
+    auto worker = [&generated, &generated_mutex]() {
+        for (int i = 0; i < 100; ++i) {
+            const std::string value = phone_number(true, true, Regions::UnitedStates, true);
+            std::lock_guard<std::mutex> lock(generated_mutex);
+            generated.push_back(value);
+        }
+    };
+
+    std::thread t1(worker);
+    std::thread t2(worker);
+    std::thread t3(worker);
+    std::thread t4(worker);
+    t1.join();
+    t2.join();
+    t3.join();
+    t4.join();
+
+    std::unordered_set<std::string> unique_values(generated.begin(), generated.end());
+    ASSERT_EQ(unique_values.size(), generated.size());
+}
+
+TEST(PersonTest, ShouldGenerateUniqueSocialNetworkIdAcrossThreads) {
+    std::vector<std::string> generated;
+    generated.reserve(400);
+    std::mutex generated_mutex;
+
+    auto worker = [&generated, &generated_mutex]() {
+        for (int i = 0; i < 100; ++i) {
+            const Bilingual value = social_network_id(Languages::English, true);
+            std::lock_guard<std::mutex> lock(generated_mutex);
+            generated.push_back(value.original());
+        }
+    };
+
+    std::thread t1(worker);
+    std::thread t2(worker);
+    std::thread t3(worker);
+    std::thread t4(worker);
+    t1.join();
+    t2.join();
+    t3.join();
+    t4.join();
+
+    std::unordered_set<std::string> unique_values(generated.begin(), generated.end());
+    ASSERT_EQ(unique_values.size(), generated.size());
 }

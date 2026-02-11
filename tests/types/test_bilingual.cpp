@@ -6,6 +6,8 @@
 
 #include <gtest/gtest.h>
 
+#include <utility>
+
 #include "faker/types/bilingual.h"
 using namespace ::faker;
 
@@ -13,6 +15,8 @@ TEST(BilingualTest, StringParam) {
     Bilingual bilingual("测试", "Test");
     ASSERT_EQ(bilingual.original(), "测试");
     ASSERT_EQ(bilingual.translation(), "Test");
+    ASSERT_EQ(bilingual.original_view(), "测试");
+    ASSERT_EQ(bilingual.translation_view(), "Test");
 
     auto str = std::string(bilingual);
     ASSERT_EQ(str, "测试");
@@ -45,4 +49,25 @@ TEST(BilingualTest, StructureParam) {
     const Bilingual         bilingual(bv);
     ASSERT_EQ(bilingual.original(), "测试");
     ASSERT_EQ(bilingual.translation(), "Test");
+}
+
+TEST(BilingualTest, MoveSemanticsPreserveData) {
+    Bilingual source("源字符串", "Translated");
+    Bilingual moved(std::move(source));
+    ASSERT_EQ(moved.original(), "源字符串");
+    ASSERT_EQ(moved.translation(), "Translated");
+
+    Bilingual assigned;
+    assigned = std::move(moved);
+    ASSERT_EQ(assigned.original(), "源字符串");
+    ASSERT_EQ(assigned.translation(), "Translated");
+}
+
+TEST(BilingualTest, EmptyRequiresBothFieldsEmpty) {
+    Bilingual bilingual("Only Original", "");
+    ASSERT_FALSE(bilingual.empty());
+
+    bilingual.set_original("");
+    bilingual.set_translation("Only Translation");
+    ASSERT_FALSE(bilingual.empty());
 }

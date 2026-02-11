@@ -35,10 +35,15 @@ public:
 
     /// @brief Bilingual constructor.
     /// @param bilingual_view Bilingual view.
-    explicit Bilingual(const BilingualView &bilingual_view);
+    explicit Bilingual(const BilingualView& bilingual_view);
+
+    Bilingual(const Bilingual&) = default;
+    Bilingual& operator=(const Bilingual&) = default;
+    Bilingual(Bilingual&&) noexcept = default;
+    Bilingual& operator=(Bilingual&&) noexcept = default;
 
     /// @brief Bilingual destructor.
-    ~Bilingual();
+    ~Bilingual() = default;
 
     /// @brief Overload. Get the original as string.
     explicit operator std::string() const;
@@ -56,15 +61,21 @@ public:
     /// @return The original.
     [[nodiscard]] std::string original() const;
 
+    /// @brief Get the original as a string view without copying.
+    [[nodiscard]] std::string_view original_view() const noexcept;
+
     /// @brief Get the translation.
     /// @return The translation of the original language
     [[nodiscard]] std::string translation() const;
+
+    /// @brief Get the translation as a string view without copying.
+    [[nodiscard]] std::string_view translation_view() const noexcept;
 
     /// @brief Swap the original and translation.
     void swap();
 
     /// @brief Check Bilingual if is empty.
-    [[nodiscard]] bool empty() const;
+    [[nodiscard]] bool empty() const noexcept;
 
 private:
     std::string original_;

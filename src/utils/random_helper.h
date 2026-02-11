@@ -10,6 +10,7 @@
 #include <array>
 #include <random>
 #include <span>
+#include <stdexcept>
 
 #include "faker/internal/export.h"
 #include "faker/types/enums.h"
@@ -23,6 +24,7 @@ namespace faker {
 /// @return A random index.
 template <typename T>
 std::size_t pick_index(std::span<const T> data) {
+    if (data.empty()) { throw std::invalid_argument("pick_index requires non-empty data"); }
     return std::uniform_int_distribution<std::size_t>(0, data.size() - 1)(get_random_engine());
 }
 
@@ -38,6 +40,7 @@ std::size_t pick_index(const std::array<T, N>& data_array) {
 /// @note Do not use this function with empty data.
 template <typename T>
 const T& pick_one(std::span<const T> data) {
+    if (data.empty()) { throw std::invalid_argument("pick_one requires non-empty data"); }
     return data[std::uniform_int_distribution<std::size_t>(0, data.size() - 1)(get_random_engine())];
 }
 

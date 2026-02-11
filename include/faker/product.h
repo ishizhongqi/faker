@@ -27,7 +27,10 @@ namespace faker::product {
 /// @return A product name.
 /// @code
 /// faker::product::product_name();  // "Mango Ultra"
-/// faker::product::product_name(faker::Languages::SimplifiedChinese, {"苹果", "橘猫", "爱新"});  // "橘猫 旗舰版"
+/// faker::product::product_name(
+///     faker::Languages::SimplifiedChinese,
+///     std::to_array<std::string_view>({"苹果", "橘猫", "爱新"})
+/// );  // "橘猫 旗舰版"
 /// @endcode
 FAKER_EXPORT std::string product_name(
     Languages                                        languages = Languages::English,

@@ -6,10 +6,14 @@
 
 #include <gtest/gtest.h>
 
+#include <array>
+#include <cmath>
+#include <limits>
 #include <regex>
 #include <string>
 
 #include "faker/number.h"
+#include "random_engine.h"
 
 using namespace ::testing;
 using namespace ::faker;
@@ -198,4 +202,50 @@ TEST(NumberTest, ShouldThrowExceptionWhenStartGreaterThanEnd) {
 
 TEST(NumberTest, ShouldThrowExceptionWhenNoPossibleValue) {
     ASSERT_THROW(decimal_string(1.2, 1.3, 0), std::invalid_argument);
+}
+
+TEST(NumberTest, ShouldUseTypedRangeValidationForLargeIntegers) {
+    ASSERT_THROW(integer<int64_t>(2147483648LL, 2147483647LL), std::invalid_argument);
+    ASSERT_THROW(unsigned_integer<uint64_t>(4294967296ULL, 1ULL), std::invalid_argument);
+}
+
+TEST(NumberTest, ShouldThrowForInvalidDecimalInputs) {
+    ASSERT_THROW(decimal_string(0.0, 1.0, 19), std::invalid_argument);
+    ASSERT_THROW(decimal(std::numeric_limits<double>::quiet_NaN(), 1.0, 2), std::invalid_argument);
+    ASSERT_THROW(decimal_string(0.0, std::numeric_limits<double>::infinity(), 2), std::invalid_argument);
+}
+
+TEST(NumberTest, ShouldThrowWhenDecimalPlacesIsNegative) {
+    ASSERT_THROW(decimal<float>(0.0F, 1.0F, -1), std::invalid_argument);
+    ASSERT_THROW(decimal_string<double>(0.0, 1.0, -3), std::invalid_argument);
+}
+
+TEST(NumberTest, ShouldThrowWhenScaledBoundsBecomeNonFinite) {
+    const double max = std::numeric_limits<double>::max();
+    ASSERT_THROW(decimal(max, max, 1), std::invalid_argument);
+}
+
+TEST(NumberTest, ShouldThrowWhenScaledBoundsExceedInt64Range) {
+    ASSERT_THROW(decimal_string(1.0e18, 1.0e18, 1), std::invalid_argument);
+}
+
+TEST(NumberTest, ShouldGenerateLongDoubleDecimalInRange) {
+    const long double value = decimal<long double>(-3.0L, 3.0L, 4);
+    ASSERT_GE(value, -3.0L);
+    ASSERT_LE(value, 3.0L);
+
+    const std::string rendered = decimal_string<long double>(-2.0L, 2.0L, 3);
+    ASSERT_TRUE(std::regex_match(rendered, std::regex(R"(^-?\d+\.\d{3}$)")));
+}
+
+TEST(NumberTest, ShouldGenerateDeterministicIntegerSequenceWhenSeeded) {
+    seed_random_engine(987654321ULL);
+    std::array<int32_t, 8> first{};
+    for (auto& value : first) { value = integer<int32_t>(-1000, 1000); }
+
+    seed_random_engine(987654321ULL);
+    std::array<int32_t, 8> second{};
+    for (auto& value : second) { value = integer<int32_t>(-1000, 1000); }
+
+    ASSERT_EQ(first, second);
 }

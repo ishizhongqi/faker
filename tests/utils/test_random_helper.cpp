@@ -6,6 +6,12 @@
 
 #include <gtest/gtest.h>
 
+#include <array>
+#include <ranges>
+#include <span>
+#include <thread>
+#include <vector>
+
 #include "faker/types/enums.h"
 #include "random_helper.h"
 
@@ -22,6 +28,16 @@ TEST(PickOneTest, Array) {
     ASSERT_TRUE(std::ranges::find(candidates.begin(), candidates.end(), picked) != candidates.end());
 }
 
+TEST(PickOneTest, EmptySpanThrows) {
+    const std::span<const int> empty_values{};
+    ASSERT_THROW([[maybe_unused]] const auto& value = pick_one(empty_values), std::invalid_argument);
+}
+
+TEST(PickIndexTest, EmptySpanThrows) {
+    const std::span<const int> empty_values{};
+    ASSERT_THROW([[maybe_unused]] const auto index = pick_index(empty_values), std::invalid_argument);
+}
+
 TEST(PickLanguageTest, CombinationOfAllLanguages) {
     std::vector<Languages> combination;
     for (int mask = 1; mask < (1 << 4); ++mask) { combination.push_back(static_cast<Languages>(mask)); }
@@ -31,6 +47,34 @@ TEST(PickLanguageTest, CombinationOfAllLanguages) {
     }
 
     ASSERT_EQ(pick_language(static_cast<Languages>(0)), Languages::English);
+}
+
+TEST(PickLanguageTest, DeterministicSeedProducesRepeatableSequence) {
+    constexpr auto all_languages =
+        Languages::English | Languages::SimplifiedChinese | Languages::TraditionalChinese | Languages::Japanese;
+
+    seed_random_engine(20260211ULL);
+    std::array<Languages, 12> first_sequence{};
+    for (auto& value : first_sequence) { value = pick_language(all_languages); }
+
+    seed_random_engine(20260211ULL);
+    std::array<Languages, 12> second_sequence{};
+    for (auto& value : second_sequence) { value = pick_language(all_languages); }
+
+    ASSERT_EQ(first_sequence, second_sequence);
+}
+
+TEST(PickLanguageTest, MultiThreadedCallsStayWithinProvidedMask) {
+    constexpr auto language_mask = Languages::English | Languages::Japanese;
+    std::array<Languages, 2> results{};
+
+    std::thread t1([&results]() { results[0] = pick_language(language_mask); });
+    std::thread t2([&results]() { results[1] = pick_language(language_mask); });
+    t1.join();
+    t2.join();
+
+    ASSERT_TRUE((results[0] & language_mask) == results[0]);
+    ASSERT_TRUE((results[1] & language_mask) == results[1]);
 }
 
 TEST(PickRegionTest, CombinationOfAllRegions) {

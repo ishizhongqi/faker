@@ -49,16 +49,22 @@ public:
 private:
     uint64_t              start_{0};
     uint64_t              end_{0};
+    uint64_t              range_size_{0};
     BaseN                 base_n_{BaseN::Decimal};
     std::atomic<uint64_t> current_{0};
     bool                  initialized_{false};
 
     uint64_t modulus_{0};
     uint64_t increment_{0};
+    uint64_t multiplier_{1};
 
     static constexpr uint64_t kMultiplier = 48271;
 
     [[nodiscard]] uint64_t scramble(uint64_t value) const;
+    [[nodiscard]] static uint64_t gcd(uint64_t lhs, uint64_t rhs);
+    [[nodiscard]] static uint64_t pick_coprime_multiplier(uint64_t modulus);
+    [[nodiscard]] static uint64_t add_mod(uint64_t lhs, uint64_t rhs, uint64_t modulus);
+    [[nodiscard]] static uint64_t mul_mod(uint64_t lhs, uint64_t rhs, uint64_t modulus);
     static std::string     to_base36(uint64_t value);
 };
 
