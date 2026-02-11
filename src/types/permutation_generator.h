@@ -12,9 +12,11 @@
 #include <source_location>
 #include <string>
 
+#include "faker/internal/export.h"
+
 namespace faker {
 
-class PermutationGenerator {
+class FAKER_EXPORT PermutationGenerator {
 public:
     enum class BaseN {
         Decimal,

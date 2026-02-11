@@ -76,11 +76,11 @@ std::string text(const unsigned int number_of_chars_start, const unsigned int nu
 }
 
 std::string uuid(const bool include_hyphens) {
-    std::mt19937_64&                       engine = get_random_engine();
-    std::uniform_int_distribution<uint8_t> byte_distribution(0, 0xFF);
+    std::mt19937_64&                            engine = get_random_engine();
+    std::uniform_int_distribution<unsigned int> byte_distribution(0U, 0xFFU);
 
     std::array<uint8_t, 16> bytes{};
-    for (auto& byte : bytes) { byte = byte_distribution(engine); }
+    for (auto& byte : bytes) { byte = static_cast<uint8_t>(byte_distribution(engine)); }
 
     // RFC 4122 version 4 and variant 1.
     bytes[6] = static_cast<uint8_t>((bytes[6] & 0x0F) | 0x40);
