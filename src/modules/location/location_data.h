@@ -540,7 +540,7 @@ const auto kChinaAddressComponents = std::to_array<AddressComponents>({
     // Province: Guangdong (广东省)
     // City: Guangzhou (广州市)
     {"510030", {{"广东省", "Guangdong Province"}, {"广州市", "Guangzhou City"}, {"越秀区", "Yuexiu District"}, {"北京街道", "Beijing Subdistrict"}}, {"中山五路##号", "No. ## Zhongshan 5th Road"}, {}},
-    {"510620", {{"广东省", "Guangdong Province"}, {"广州市", "Guangzhou City"}, {"天河区", "Tianhe District"}, {"天河南街道", "Tianhenan Subdistrict"}}, {"体育西路##号", "No. ## Tiyu West Road"}, {"#座##层", "## Tower, Fl ##"}},
+    {"510620", {{"广东省", "Guangdong Province"}, {"广州市", "Guangzhou City"}, {"天河区", "Tianhe District"}, {"天河南街道", "Tianhenan Subdistrict"}}, {"体育西路##号", "No. ## Tiyu West Road"}, {"#座##层", "# Tower, Fl ##"}},
     {"510627", {{"广东省", "Guangdong Province"}, {"广州市", "Guangzhou City"}, {"天河区", "Tianhe District"}, {"冼村街道", "Xiancun Subdistrict"}}, {"黄埔大道西##号", "No. ## Huangpu Avenue West"}, {"##室", "Rm ##"}},
     {"510240", {{"广东省", "Guangdong Province"}, {"广州市", "Guangzhou City"}, {"海珠区", "Haizhu District"}, {"江南中街道", "Jiangnanzhong Subdistrict"}}, {"江南大道中##号", "No. ## Jiangnan Avenue Middle"}, {}},
     {"510130", {{"广东省", "Guangdong Province"}, {"广州市", "Guangzhou City"}, {"荔湾区", "Liwan District"}, {"沙面街道", "Shamian Subdistrict"}}, {"沙面北街##号", "No. ## Shamian North Street"}, {}},
@@ -681,13 +681,13 @@ const auto kChinaAddressComponents = std::to_array<AddressComponents>({
     {"450008", {{"河南省", "Henan Province"}, {"郑州市", "Zhengzhou City"}, {"金水区", "Jinshui District"}, {"未来路街道", "Weilai Road Subdistrict"}}, {"金水东路##号", "No. ## Jinshui East Road"}, {}},
     {"450000", {{"河南省", "Henan Province"}, {"郑州市", "Zhengzhou City"}, {"二七区", "Erqi District"}, {"解放路街道", "Jiefang Road Subdistrict"}}, {"二七路##号", "No. ## Erqi Road"}, {"##室", "Rm ##"}},
     {"450004", {{"河南省", "Henan Province"}, {"郑州市", "Zhengzhou City"}, {"管城回族区", "Guancheng Hui Autonomous District"}, {"西大街街道", "West Street Subdistrict"}}, {"西大街##号", "No. ## West Street"}, {}},
-    {"450046", {{"河南省", "Henan Province"}, {"郑州市", "Zhengzhou City"}, {"郑东新区", "Zhengdong New Area"}, {"如意湖街道", "Ruyihu Subdistrict"}}, {"商务内环路##号", "No. ## Shangwu Inner Ring Road"}, {"##层", "Fl #"}},
+    {"450046", {{"河南省", "Henan Province"}, {"郑州市", "Zhengzhou City"}, {"郑东新区", "Zhengdong New Area"}, {"如意湖街道", "Ruyihu Subdistrict"}}, {"商务内环路##号", "No. ## Shangwu Inner Ring Road"}, {"##层", "Fl ##"}},
 
     // Province: Hebei (河北省)
     // City: Shijiazhuang (石家庄市)
     {"050011", {{"河北省", "Hebei Province"}, {"石家庄市", "Shijiazhuang City"}, {"长安区", "Chang'an District"}, {"广安街道", "Guang'an Subdistrict"}}, {"中山东路##号", "No. ## Zhongshan East Road"}, {}},
     {"050011", {{"河北省", "Hebei Province"}, {"石家庄市", "Shijiazhuang City"}, {"长安区", "Chang'an District"}, {"建北街道", "Jianbei Subdistrict"}}, {"建设北大街##号", "No. ## Jianshe North Street"}, {}},
-    {"050051", {{"河北省", "Hebei Province"}, {"石家庄市", "Shijiazhuang City"}, {"桥西区", "Qiaoxi District"}, {"中山路街道", "Zhongshan Road Subdistrict"}}, {"中华大街##号", "No. ## Zhonghua Street"}, {"#座##", "Block #"}},
+    {"050051", {{"河北省", "Hebei Province"}, {"石家庄市", "Shijiazhuang City"}, {"桥西区", "Qiaoxi District"}, {"中山路街道", "Zhongshan Road Subdistrict"}}, {"中华大街##号", "No. ## Zhonghua Street"}, {"#座", "Block #"}},
     {"050051", {{"河北省", "Hebei Province"}, {"石家庄市", "Shijiazhuang City"}, {"新华区", "Xinhua District"}, {"合作路街道", "Hezuo Road Subdistrict"}}, {"合作路##号", "No. ## Hezuo Road"}, {}},
     {"050031", {{"河北省", "Hebei Province"}, {"石家庄市", "Shijiazhuang City"}, {"裕华区", "Yuhua District"}, {"裕兴街道", "Yuxing Subdistrict"}}, {"槐安东路##号", "No. ## Huai'an East Road"}, {"#期#栋", "Phase #, Bldg #"}},
 
@@ -802,7 +802,7 @@ const auto kJapanAddressComponents = std::to_array<AddressComponents>({
     {"001-0010", {{"北海道", "Hokkaidō"}, {"札幌市北区", "Sapporo-shi, Kita-ku"}}, {"北十条西#-##", "#-##, Kita-10-jō-Nishi"}, {"##マンション##号", "## Mansion, Rm. ##"}},
 
     // City: Hakodate-shi (函館市)
-    {"040-0053", {{"北海道", "Hokkaidō"}, {"函館市", "Hakodate-shi"}}, {"末広町##-##", "#-##, Suehirochō"}, {}},
+    {"040-0053", {{"北海道", "Hokkaidō"}, {"函館市", "Hakodate-shi"}}, {"末広町##-##", "##-##, Suehirochō"}, {}},
 
     // City: Otaru-shi (小樽市)
     {"047-0027", {{"北海道", "Hokkaidō"}, {"小樽市", "Otaru-shi"}}, {"堺町#-##", "#-##, Sakaimachi"}, {}},
