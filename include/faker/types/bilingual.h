@@ -1,0 +1,87 @@
+// Copyright (c) 2025 Shizhongqi
+// Licensed under the MIT License.
+// See the LICENSE file in the project root for more information.
+
+/// @file bilingual.h
+
+#ifndef FAKER_BILINGUAL_H
+#define FAKER_BILINGUAL_H
+
+#include <string>
+#include <string_view>
+
+#include "faker/internal/export.h"
+
+namespace faker {
+
+/// @brief View for storing bilingual content.
+struct FAKER_EXPORT BilingualView {
+    std::string_view original;
+    std::string_view translation;
+};
+
+/// @brief Used for storing strings containing bilingual content.
+///        If you need to use the object as a string, you must perform an explicit conversion.
+class FAKER_EXPORT Bilingual {
+public:
+    /// @brief Bilingual constructor.
+    Bilingual();
+
+    /// @brief Bilingual constructor.
+    ///        If you need to use the object as a string, you must perform an explicit conversion.
+    /// @param original Original language.
+    /// @param translation The translation of the original language.
+    Bilingual(std::string_view original, std::string_view translation);
+
+    /// @brief Bilingual constructor.
+    /// @param bilingual_view Bilingual view.
+    explicit Bilingual(const BilingualView& bilingual_view);
+
+    Bilingual(const Bilingual&) = default;
+    Bilingual& operator=(const Bilingual&) = default;
+    Bilingual(Bilingual&&) noexcept = default;
+    Bilingual& operator=(Bilingual&&) noexcept = default;
+
+    /// @brief Bilingual destructor.
+    ~Bilingual() = default;
+
+    /// @brief Overload. Gets the original as a string.
+    explicit operator std::string() const;
+
+    /// @brief Overload. Gets the original as a string_view.
+    explicit operator std::string_view() const;
+
+    /// @brief Set the original.
+    void set_original(std::string_view original);
+
+    /// @brief Set the translation.
+    void set_translation(std::string_view translation);
+
+    /// @brief Gets the original.
+    /// @return The original.
+    [[nodiscard]] std::string original() const;
+
+    /// @brief Gets the original as a string view without copying.
+    [[nodiscard]] std::string_view original_view() const noexcept;
+
+    /// @brief Gets the translation.
+    /// @return The translation of the original language
+    [[nodiscard]] std::string translation() const;
+
+    /// @brief Gets the translation as a string view without copying.
+    [[nodiscard]] std::string_view translation_view() const noexcept;
+
+    /// @brief Swap the original and translation.
+    void swap();
+
+    /// @brief Checks whether the Bilingual object is empty.
+    [[nodiscard]] bool empty() const noexcept;
+
+private:
+    std::string original_;
+    std::string translation_;
+};
+
+}  // namespace faker
+
+#endif  // FAKER_BILINGUAL_H

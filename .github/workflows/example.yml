@@ -1,0 +1,45 @@
+name: example
+
+on:
+  push:
+    branches:
+      - "main"
+    paths-ignore:
+      - "**/*.md"
+      - "LICENSE"
+  pull_request:
+    branches:
+      - "main"
+    paths-ignore:
+      - "**/*.md"
+      - "LICENSE"
+  workflow_dispatch:
+
+jobs:
+  example:
+    name: ci_ubuntu-24.04_example
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            cmake \
+            ninja-build \
+            clang
+
+      - name: Configure
+        run: |
+          cmake -S . -B build \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DFAKER_BUILD_SHARED:BOOL=OFF \
+            -DFAKER_BUILD_EXAMPLE:BOOL=ON \
+            -DFAKER_BUILD_TESTS:BOOL=OFF \
+            -DFAKER_CODE_COVERAGE:BOOL=OFF
+
+      - name: Build example
+        run: cmake --build build

@@ -5,11 +5,14 @@
 .vs
 dist/
 
+# clangd
+.cache/
+
 # CMake
 out/
 CMakeSettings.json
 build/
-build-*/
+build*/
 cmake-build-*/
 
 # Log files created by default by the nohup command

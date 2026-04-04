@@ -6,3 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.0.0] - 2026-04-04
+
+### Added
+
+- Initial stable release of the `faker` C++ library with business, computer, datetime, location, number, payment, person, product, and string modules.
+- Bilingual and localized fake data support for English, Simplified Chinese, Traditional Chinese, and Japanese.
+- Example project, API guides, Doxygen configuration, cross-platform CI workflows, code coverage, and comprehensive unit tests.

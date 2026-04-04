@@ -1,0 +1,48 @@
+name: msvc
+
+on:
+  push:
+    branches:
+      - "main"
+    paths-ignore:
+      - "**/*.md"
+      - "LICENSE"
+  pull_request:
+    branches:
+      - "main"
+    paths-ignore:
+      - "**/*.md"
+      - "LICENSE"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ci_windows-latest_msvc_${{ matrix.lib }}
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        lib:
+          - static
+          - shared
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        run: |
+          cmake -S . -B build `
+            -G "Visual Studio 17 2022" `
+            -A x64 `
+            -DCMAKE_BUILD_TYPE=Debug `
+            -DFAKER_BUILD_SHARED=${{ matrix.lib == 'shared' && 'ON' || 'OFF' }} `
+            -DFAKER_BUILD_EXAMPLE=OFF `
+            -DFAKER_BUILD_TESTS=ON `
+            -DFAKER_CODE_COVERAGE=OFF
+
+      - name: Build
+        run: |
+          cmake --build build --config Debug
+
+      - name: Test
+        run: |
+          ctest --test-dir build --build-config Debug --output-on-failure
